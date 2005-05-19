@@ -1,12 +1,32 @@
 package org.merlotxml.merlot;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.*;
-import java.util.*;
-import matthew.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Properties;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 
 public class MerlotPreferenceDialog extends JDialog implements MerlotConstants,
     ListSelectionListener, ActionListener {
@@ -211,10 +231,10 @@ public class MerlotPreferenceDialog extends JDialog implements MerlotConstants,
         }
         // load the properties with key start with filterStr 
         public void load(Properties prop, String filterStr) {
-            Enumeration enum = prop.propertyNames();
+            Enumeration en = prop.propertyNames();
             Vector v = new Vector();
-            for (int i=0; enum.hasMoreElements(); i++) {
-                 String key = (String)enum.nextElement(); 
+            for (int i=0; en.hasMoreElements(); i++) {
+                 String key = (String)en.nextElement(); 
                  if (filterStr.trim().equals("")){
                      v.add(key);
                  } else {

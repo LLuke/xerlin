@@ -56,40 +56,56 @@ http://www.merlotxml.org/
 
 package org.merlotxml.merlot;
 
-import java.awt.BorderLayout;
-import java.awt.Rectangle;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.*;
+import java.awt.FileDialog;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.StringTokenizer;
 
-import java.awt.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.tree.TreePath;
 
-import java.io.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
-
-
-import com.sun.javax.swing.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.util.*;
-import java.text.*;
-
-import org.w3c.dom.*;
-
-import org.merlotxml.util.xml.*;
 import matthew.awt.StrutLayout;
-import org.merlotxml.awt.*;
 
+import org.merlotxml.awt.PercentLayout;
+import org.merlotxml.util.xml.DTDCache;
+import org.merlotxml.util.xml.DTDCacheEntry;
+
+import com.sun.javax.swing.JTreeTable;
+import com.sun.javax.swing.TreeTableModel;
 /**
  * 
  * A library of XML components (and or other stuff at some point)
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: MerlotLibrary.java,v 1.10 2002/09/14 10:33:39 justin Exp $
  *
  */
 
@@ -121,6 +137,7 @@ public class MerlotLibrary extends JInternalFrame
 	
 
     private static final int LIB_BOUNDS_FUDGE_FACTOR = 15;
+    private static String _systemID = null;
 	
     static 
     {
@@ -136,7 +153,8 @@ public class MerlotLibrary extends JInternalFrame
             System.out.println("lib dtd stream = "+stream);
             
             if (stream != null) {
-                entry.setSystemId(u.toString());
+                _systemID = u.toString();
+                entry.setSystemId(_systemID);
                 cache.loadDTDIntoCache(stream, entry);
             }
         }
@@ -213,7 +231,8 @@ public class MerlotLibrary extends JInternalFrame
 		String[] dtda = new String[3];
 		dtda[0] = MerlotResource.getString(XML,"library.doctype");
 		dtda[1] = MerlotResource.getString(XML,"library.doctype.public");
-		dtda[2] = MerlotResource.getString(XML,"library.doctype.dtdfile");
+		dtda[2] = _systemID;
+            //MerlotResource.getString(XML,"library.doctype.dtdfile");
 				
 				
 		MessageFormat mf = new MessageFormat(MerlotResource.getString(XML,"doctype.declaration"));
@@ -595,6 +614,7 @@ public class MerlotLibrary extends JInternalFrame
 	    if (newsection instanceof MerlotDOMElement) {
 		((MerlotDOMElement)newsection).setAttribute("name",namefield.getText());
 	    }
+
 	}
 			
 	
@@ -982,17 +1002,19 @@ public class MerlotLibrary extends JInternalFrame
 	    MerlotUtils.loadActionResources(this,UI,"library.item.paste");
 	}
 		
-	public void actionPerformed(ActionEvent evt)  {
+	public void actionPerformed(ActionEvent evt) 
+	{
 	    int row = _table.getSelectedRow();
 			
 	    Transferable t = XMLEditorFrame.getSharedInstance().getTreeClipboard().getContents(this);
-	    if (t instanceof MerlotDOMFragment) 	
-		    _tableModel.addItemLater(row, (MerlotDOMFragment)t,
-                                    DNDJTreeTableModel.INTO, true);
-		    /*
-		    _tableModel.importFragment(row,(MerlotDOMFragment)t,DNDJTreeTableModel.INTO, true);
-			*/
+	    if (t instanceof MerlotDOMFragment) {	
+		_tableModel.addItemLater(row, (MerlotDOMFragment)t,DNDJTreeTableModel.INTO, true);
+				/*
+				  _tableModel.importFragment(row,(MerlotDOMFragment)t,DNDJTreeTableModel.INTO, true);
+				*/
 	    }
+			
+	}
     }
 
     protected class RenameLibItemAction extends AbstractAction 

@@ -52,15 +52,17 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-import org.merlotxml.util.xml.XPathUtil;
-import org.merlotxml.util.xml.DTDConstants;
 import org.merlotxml.merlot.MerlotDebug;
-
-import org.w3c.dom.*;
-
+import org.merlotxml.util.xml.DTDConstants;
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /*

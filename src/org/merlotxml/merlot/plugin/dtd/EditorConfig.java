@@ -52,20 +52,16 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
 
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
-
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
  * Merlot Pluggable Editor Configuration
  * 
  * @author Tim McCune
- * @version $Id: EditorConfig.java,v 1.2 2000/05/23 21:31:25 timm Exp $
  */
 class EditorConfig extends DefaultEditorConfig {
 	

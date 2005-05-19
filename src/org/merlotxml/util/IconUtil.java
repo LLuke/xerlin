@@ -52,8 +52,12 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.util;
 
-import java.io.*;
-import javax.swing.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 public class IconUtil {
 	

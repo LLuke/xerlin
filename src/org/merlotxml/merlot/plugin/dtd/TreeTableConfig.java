@@ -52,13 +52,10 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.io.*;
-import java.util.*;
+import java.util.List;
 
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
-
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class TreeTableConfig 

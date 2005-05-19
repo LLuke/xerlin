@@ -50,28 +50,29 @@ For information on the Merlot project, please see
 http://www.channelpoint.com/merlot.
 */
 
-
 // Copyright 1999 ChannelPoint, Inc., All Rights Reserved.
 
-package org.merlotxml.merlot;    
+package org.merlotxml.merlot;
 
 import java.io.File;
 
-public class DTDFileFilter extends MerlotFileFilter
-{
-	public boolean accept(File f) 
-	{
-		String n = f.getName();
-		return (f.isDirectory() || n.endsWith(".dtd"));
-	}
-	public boolean accept(File dir, String name) 
-	{
-		return (name.endsWith(".dtd"));
-	}
-		
-		
-	public String getDescription() 
-	{
-		return "DTD Files";
-	}
+public class DTDFileFilter extends MerlotFileFilter {
+    public boolean accept(File f) {
+        String n = f.getName();
+        return (
+            f.isDirectory()
+                || n.endsWith(".dtd")
+                || n.endsWith(".xsd")
+                || n.endsWith(".mod"));
+    }
+    public boolean accept(File dir, String name) {
+        return (
+            name.endsWith(".dtd")
+                || name.endsWith(".xsd")
+                || name.endsWith(".mod"));
+    }
+
+    public String getDescription() {
+        return "Schema/DTD Files";
+    }
 }

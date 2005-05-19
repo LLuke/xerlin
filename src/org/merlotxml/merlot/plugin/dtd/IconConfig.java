@@ -52,19 +52,16 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.util.*;
+import java.util.List;
 
-import org.merlotxml.util.xml.*;
-
-import org.w3c.dom.*;
-
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
  * Merlot Pluggable Icon Configuration
  * 
  * @author Tim McCune
- * @version $Id: IconConfig.java,v 1.1 2000/05/25 06:54:33 timm Exp $
  */
 class IconConfig {
 	

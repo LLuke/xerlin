@@ -57,13 +57,21 @@ package org.merlotxml.merlot;
 
 /* -*- Mode: Java; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*-
  *
- * $Id: MerlotSplashScreen.java,v 1.2 2000/03/07 04:46:14 camk Exp $
+ * $Id: MerlotSplashScreen.java,v 1.2.8.1 2003/02/28 07:14:04 justin Exp $
  *
  */
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 
 
 

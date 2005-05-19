@@ -37,10 +37,16 @@
 
 package org.merlotxml.merlot;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.util.Vector;
+
+import javax.swing.Action;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.MenuElement;
 import javax.swing.SwingUtilities;
 
 public class SizeableJPopupMenuByHeight extends JPopupMenu {
@@ -131,7 +137,7 @@ public class SizeableJPopupMenuByHeight extends JPopupMenu {
 	
 	// Forcibly insert the item into the menu
 	JMenuItem tempMenuItem = super.add(a);
-	super.remove(tempMenuItem);
+	//super.remove(tempMenuItem);
 	
 	// Determine if we can insert this into the primary menu
 	// or if we must insert into the more menu.
@@ -140,10 +146,11 @@ public class SizeableJPopupMenuByHeight extends JPopupMenu {
 	double menuItemHeight = tempMenuItem.getPreferredSize().getHeight();
 	
 	if ((preferredHeight + menuItemHeight) < maximumHeight) {
-	    retVal = super.add(a);
+	    retVal = tempMenuItem;
 	}
 	else {
 	    // Create the more menu if necessary
+        super.remove(tempMenuItem);
 	    createMoreMenu();
 	    // Add item to the More Menu.
 	    retVal = moreMenu.add(a);
@@ -274,7 +281,7 @@ public class SizeableJPopupMenuByHeight extends JPopupMenu {
 	int itemCount = getComponentCount();
 	MenuElement[] retVal = null;
 
-	if (itemCount < itemCount) {
+	if (moreMenu==null) {
 	    retVal = super.getSubElements();
 	}
 	else {

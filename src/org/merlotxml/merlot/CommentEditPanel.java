@@ -52,20 +52,15 @@
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.beans.*;
-import java.text.MessageFormat;
+import java.awt.Dimension;
+import java.beans.PropertyVetoException;
+import java.util.HashMap;
 
-import java.awt.event.*;
-import java.util.*;
-import org.w3c.dom.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import com.sun.javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
-import matthew.awt.StrutLayout;
-import org.merlotxml.util.xml.*;
+import org.merlotxml.util.xml.DTDConstants;
 
 
 /**
@@ -116,7 +111,8 @@ public class CommentEditPanel extends GenericDOMEditPanel
 			} else {
 				MerlotDebug.msg("Comment Node setText " + _text.getText());
 				_commentNode.setText(_text.getText());
-					
+		
+                /*			
 				if (_subtext == null) {
 					// create a new TextNode
 					MerlotDOMNode nd = _node.newChild(DTDConstants.PCDATA_KEY);
@@ -127,6 +123,7 @@ public class CommentEditPanel extends GenericDOMEditPanel
 				if (_subtext != null) {
 					_subtext.setText(_text.getText());
 				}
+                */
 			}
 		}
 

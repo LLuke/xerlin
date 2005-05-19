@@ -52,28 +52,32 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.undo.*;
-import java.util.*;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Transferable;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import com.sun.javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreePath;
+import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.UndoManager;
+import javax.swing.undo.UndoableEdit;
 
-import org.merlotxml.merlot.plugin.dtd.*;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import org.w3c.dom.*;
+import com.sun.javax.swing.JTreeTable;
+import com.sun.javax.swing.TreeTableModel;
 
 /**
  * 
  * Adapts a DOM Document object into a TreeTableModel
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: DOMTreeTableAdapter.java,v 1.18 2002/09/12 00:26:43 justin Exp $
  *
  */
 public class DOMTreeTableAdapter extends DNDJTreeTableModel
@@ -119,6 +123,15 @@ public class DOMTreeTableAdapter extends DNDJTreeTableModel
 		if (_root != null) {
 			_root.addMerlotNodeListener(this);
 			addIDManagerAsNodeListener();
+            // Starting validation at the top node
+            MerlotDOMNode firstChild = (MerlotDOMNode)_root.getChildElements().get(0);
+            MerlotDebug.msg("First child: " + firstChild);
+            if (firstChild instanceof MerlotDOMElement) {
+                MerlotDebug.msg("Starting validation...");
+                ((MerlotDOMElement)firstChild).validate();
+            } else {
+                MerlotDebug.msg("Can't start validation, first child is not a MerlotDOMElement: " + firstChild.getClass());
+			}
 		}
 		else {
 			MerlotDebug.msg("DOMTreeTableAdapter root is null");
@@ -503,6 +516,19 @@ public class DOMTreeTableAdapter extends DNDJTreeTableModel
     }
     
     /**
+	 * Refreshes the node in the tree
+	 */
+    public void refreshNode(MerlotDOMNode node) {
+        int[] path = getLocationPathForNode(node);
+        if (path.length > 0) {
+            int loc = path[path.length-1];
+            ListSelectionEvent event = new ListSelectionEvent(_table, loc, loc, false);
+            _table.valueChanged(event);
+            _table.repaint();
+        }
+    }
+    
+    /**
      * This gets the location of a node specified by the indices of the 
      * nodes in the path within their parent containers. This creates a 
      * snapshot of where a node was located at a certain time specifically
@@ -679,7 +705,10 @@ public class DOMTreeTableAdapter extends DNDJTreeTableModel
     XMLEditorDocUI xed = null;
     if (xef!=null) {
         doc  = xef.getCurrentDocument();
-        if (doc!=null) //library case
+        if (doc == null && _file!=null) {
+            doc = _file.getXMLEditorDoc();
+        }
+        if (doc!=null)
             xed = doc.getXMLEditorDocUI();
     } else {
         XerlinPanel xp = XMLEditor.getSharedInstance().getXerlinPanel();
@@ -833,8 +862,10 @@ public class DOMTreeTableAdapter extends DNDJTreeTableModel
 		if (ret && orig != null) {
 		    for (int i=0;i<orig.length;i++) {
 			int[] location = getLocationPathForNode(orig[i]);
-			//orig[i].delete();
-            xed.deleteNode(orig[i]);
+            if (xed!=null)
+                xed.deleteNode(orig[i]);
+            else
+                orig[i].delete();
 			edit = new MerlotUndoableEdit(undoDesc, MerlotUndoableEdit.DELETE, this, orig[i], location);
 			bigedit.addEdit(edit);
 			MerlotDebug.msg("orig node deleted");

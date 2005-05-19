@@ -52,20 +52,24 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.io.*;
-import java.util.zip.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
-import org.merlotxml.util.xml.*;
-
-import org.w3c.dom.*;
-
+import org.merlotxml.util.xml.DTDCache;
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
  * Merlot Pluggable DTD Configuration
  * 
  * @author Tim McCune
- * @version $Id: DTDConfig.java,v 1.4 2001/08/14 15:47:26 camk Exp $
  */
 class DTDConfig {
 	

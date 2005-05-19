@@ -1,26 +1,23 @@
 package org.merlotxml.util.xml;
 
-import java.util.*;					
+import java.util.ArrayList;
+import java.util.List;
 
-//import org.apache.xalan.xpath.*;
-//import org.apache.xalan.xpath.xml.*;
-import org.apache.xpath.*;
-import org.apache.xpath.objects.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
 import javax.xml.transform.TransformerException;
 
-// Imported JAVA API for XML Parsing classes
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException; 
-import java.io.*;
+import org.apache.xpath.XPathAPI;
+import org.apache.xpath.objects.XObject;
+import org.apache.xpath.objects.XString;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * General XPath utilities
  * 
  * @author Tim McCune (with thanks to Scott Boag for providing the initial example)
- * @version $Id: XPathUtil.java,v 1.7 2001/12/05 23:45:50 justin Exp $
  */
 public class XPathUtil {
 	

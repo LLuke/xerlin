@@ -55,20 +55,13 @@ http://www.merlotxml.org
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
+import java.beans.PropertyVetoException;
 
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
-import org.merlotxml.util.xml.*;
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.GrammarComplexType;
 
 
 /**
@@ -80,7 +73,6 @@ import org.merlotxml.util.xml.*;
  * plugin classes instead of here... it doesn't really belong here.)
  * 
  * @author Kelly A. Campbell
- * @version $Id: MerlotDOMEditor.java,v 1.6 2000/05/25 22:16:21 timm Exp $
  * @see org.merlotxml.merlot.GenericDOMEditor
  * @see org.merlotxml.merlot.GenericDOMEditPanel
  *
@@ -137,9 +129,10 @@ public interface MerlotDOMEditor
 	 * example, the plugin for the accessibility permissions might not
 	 * want the user to be able to directly add an "access" element, so
 	 * it can request that that be suppressed.
+     * @deprecated
 	 */
 	public boolean suppressAddType(DTDElement el);
 	
-
+    public boolean suppressAddType(GrammarComplexType el);
 	  
 }

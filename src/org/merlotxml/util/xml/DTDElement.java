@@ -55,8 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
 
 /**
  * This is an interface that will provide DTD information about an element
@@ -72,13 +71,14 @@ import java.util.*;
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: DTDElement.java,v 1.3 2000/03/10 05:31:17 camk Exp $
+ * @deprecated Use GrammarComplexType.
  */
 
 public interface DTDElement 
 {
 	/**
 	 * Returns the name of this element
+     * @deprecated Use GrammarComplexType.
 	 */
 	public String getName();
 	
@@ -93,12 +93,14 @@ public interface DTDElement
 	/**
 	 * Returns the list of attributes
 	 * @return an enumeration consisting of DTDAttribute objects or null
+     * @deprecated Use GrammarComplexType.
 	 */
 	public Enumeration    getAttributes();
 	
 
 	/**
 	 * Returns a single named attribute for this element
+     * @deprecated Use GrammarComplexType.
 	 */
 	public DTDAttribute   getAttribute(String name);
 	

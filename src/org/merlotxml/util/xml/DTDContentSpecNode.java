@@ -55,8 +55,6 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
 
 /**
  * Interface to specify a ContentSpecification node.
@@ -89,7 +87,6 @@ import java.util.*;
  * </PRE>
  *
  * @author Kelly A. Campbell
- * @version $Id: DTDContentSpecNode.java,v 1.3 2000/03/10 05:31:17 camk Exp $
  */
 
 public interface DTDContentSpecNode

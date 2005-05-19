@@ -17,20 +17,25 @@ Targets:
 
   <property name="name.short" value="Xerlin"/>
   <property name="name.long" value="Xerlin XML Editor"/>
-  <property name="version" value="1.2"/>
+  <property name="version" value="1.3"/>
 	
   <property name="jar.name" value="${name.short}-${version}.jar"/>
 
   <property name="build.dir" value="build"/>
   <property name="build.classes" value="${build.dir}/classes"/>
-  <property name="xerces" value="xerces-1.4.0.jar"/>
-  <property name="xalan" value="xalan-2.1.0.jar"/>
+  <property name="xerces" value="dom3-xercesImpl-2.6.2.jar"/>
+  <property name="xmlParserAPIs" value="dom3-xml-apis-2.6.2.jar"/>
+  <property name="xalan" value="xalan-2.4.0.jar"/>
   <property name="strutlayout" value="StrutLayout1.2.1.jar"/>
   <property name="javahelp" value="jh.jar"/>
   <property name="thirdparty" value="thirdparty.jar"/>
+  <property name="webdav" value="webdavlib.jar"/>
+  <property name="chooser" value="davfilechooser.jar"/>
+  <property name="commons" value="commons.jar"/>
+  <property name="mrj" value="MRJToolkitStubs.jar"/>
 
-  <property name="classpath" value="lib:lib/${strutlayout}:lib/${xalan}:lib/${xerces}:lib/${javahelp}"/>
-  <property name="classpath.runtime" value="lib/${javahelp} lib/${thirdparty} lib/${strutlayout} lib/${xalan} lib/${xerces}"/>
+  <property name="classpath" value="lib:lib/${strutlayout}:lib/${xerces}:lib/${xmlParserAPIs}:lib/${xalan}:lib/${javahelp}:lib/${thirdparty}:lib/${commons}:lib/${webdav}:lib/${chooser}:lib/${mrj}"/>
+  <property name="classpath.runtime" value="lib/${javahelp} lib/${thirdparty} lib/${strutlayout} lib/${xerces} lib/${xmlParserAPIs} lib/${xalan} lib/${commons} lib/${webdav} lib/${chooser} lib/${mrj}"/>
   <property name="classpath.runtime.mac" value="${jar.name}:${classpath}"/>
   <property name="macos.X.dir" value="lib/mac"/>
 
@@ -82,14 +87,15 @@ Targets:
     <mkdir dir="${build.classes}"/>
 		
     <javac srcdir="${src.dir}"
-	destdir="${build.classes}"
-	excludes="${exclude}"
+	    destdir="${build.classes}"
+        excludes="${exclude}"
        	classpath="${classpath}"
-	deprecation="on"
-	optimize="on"
+        deprecation="off"
+        optimize="on"
+        debug="on"
      />
 
-    <copy todir="${build.classes}" filtering="yes">
+    <copy todir="${build.classes}" filtering="no">
       <fileset dir="${src.dir}"
 	       includes="**/*.properties,**/*.xml,**/*.dtd"
        />
@@ -105,7 +111,7 @@ Targets:
 <!-- ===========================================================================
                                 Jar up the classes
      =========================================================================== -->
-  <target name="jar" depends="compile,thirdparty">
+  <target name="jar" depends="compile">
     <!-- Fork in order to get the local classpath -->
     <delete file="${manifest}"/>
     <java classname="org.merlotxml.util.ManifestMaker"
@@ -222,10 +228,10 @@ Targets:
     <copy todir="${dist.src.dir}" filtering="no">
       <fileset dir="${basedir}">
         <patternset id="dist.sources">
-          <exclude name="${dist.dir}"/>
-          <exclude name="${build.dir}"/>
-	  <exclude name="plugins"/>
-	  <exclude name="examples"/>
+          <exclude name="${dist.dir}/"/>
+          <exclude name="${build.dir}/"/>
+	  <exclude name="plugins/"/>
+	  <exclude name="examples/"/>
         </patternset>
       </fileset>
     </copy>
@@ -260,7 +266,6 @@ Targets:
     <delete dir="${javadoc.dir}"/>
     <delete file="${name.short}-${version}.jar"/>
     <delete file="${manifest}"/>
-    <delete file="${lib.dir}/thirdparty.jar"/>
   </target>
 	
 <!-- ===========================================================================

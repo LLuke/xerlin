@@ -55,10 +55,8 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
-
-import org.w3c.dom.*;
+import java.io.InputStream;
+import java.io.Writer;
 
 /**
  * This interface provides means to access the DTD definitions as well as the
@@ -68,7 +66,6 @@ import org.w3c.dom.*;
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: ValidDOMLiaison.java,v 1.4 2000/08/20 00:07:32 camk Exp $
  */
 
 public interface ValidDOMLiaison extends DOMLiaison

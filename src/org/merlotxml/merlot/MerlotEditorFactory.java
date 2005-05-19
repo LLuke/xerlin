@@ -55,20 +55,14 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
-import org.merlotxml.merlot.plugin.*;
-import org.merlotxml.merlot.plugin.dtd.*;
-import org.merlotxml.util.xml.*;
+import java.util.StringTokenizer;
+
+import org.merlotxml.merlot.plugin.PluginConfig;
+import org.merlotxml.merlot.plugin.dtd.DTDPluginConfig;
 
 /**
  * Factory singleton to get editors for particular types of nodes and elements.
@@ -96,6 +90,11 @@ public class MerlotEditorFactory
 	 */
 	protected MerlotDOMEditor _default = null;
 	
+        /**
+         * The defalt schema editor 
+         */
+        protected MerlotDOMEditor _defaultSchemaEditor = null;
+	
 	
 	private MerlotEditorFactory()
 	{
@@ -114,10 +113,28 @@ public class MerlotEditorFactory
 		catch (Exception ex) {
 			MerlotDebug.exception(ex);
 		}
+		String defaultSchemaEditorName =  XMLEditorSettings.getSharedInstance().getDefaultSchemaEditor();
+
+        try {
+            if (defaultSchemaEditorName != null) {
+                Class c = Class.forName(defaultSchemaEditorName);
+                Object o = c.newInstance();
+                if (o instanceof MerlotDOMEditor) {
+                    _defaultSchemaEditor = (MerlotDOMEditor)o;
+                 }
+            } 
+        } catch (Exception ex) {
+            MerlotDebug.exception(ex);
+        }
+		
 		// we absolutely must have a default editor... 
 		if (_default == null) {
-			_default = new GenericDOMEditor();
+		    _default = new GenericDOMEditor();
 		}
+
+        if (_defaultSchemaEditor == null) {
+            _defaultSchemaEditor = _default; 
+        }
 
 		// initialize the global editors 
 		_globalEditors = new Hashtable();
@@ -209,8 +226,12 @@ public class MerlotEditorFactory
 	 * @param plugin optional plugin (can be null)
 	 * @return a panel for editing this particular node or node type
 	 */
+        public MerlotDOMEditor getEditor(String nodeName, DTDPluginConfig config)
+        throws InstantiationException, IllegalAccessException {
+            return getEditor(nodeName, config, false);
+        }
 	
-	public MerlotDOMEditor getEditor(String nodeName, DTDPluginConfig config)
+	public MerlotDOMEditor getEditor(String nodeName, DTDPluginConfig config, boolean useSchema)
 	throws InstantiationException, IllegalAccessException
 	{
 		
@@ -235,24 +256,6 @@ public class MerlotEditorFactory
 		    }
 		}
 		
-		/* -- this is wrong because we should only search in the plugin associated with this DTD...
-		 * plugins might want to handle the same element type in different dtd's differently. 
-		 * for example, the xmlspec20 dtd has a <p> element, so do many other dtd's. 
-		
-//		 iter = PluginManager.getInstance().getPlugins().iterator();
-// 		 while (iter.hasNext()) {
-// 		 	nextConfig = (PluginConfig) iter.next();
-// 			if (nextConfig instanceof DTDPluginConfig) {
-// 				config = (DTDPluginConfig) nextConfig;
-// 				if ( (editorClass = config.getEditorClassFor(nodeName)) != null) {
-// 				    Object o = editorClass.newInstance();
-// 				    if (o instanceof MerlotDOMEditor){
-// 					rtn = (MerlotDOMEditor)o;
-// 				    }
-// 				}
-// 			}
-// 		}
-		*/
 		if (rtn == null) {
 		    // if the plugin didn't return us an editor, try the global table
 		    if ( (globalEditor = _globalEditors.get(nodeName)) instanceof MerlotDOMEditor) {
@@ -263,48 +266,13 @@ public class MerlotEditorFactory
 		
 		//Finally, use the global default
 		if (rtn == null) {
-		    rtn = _default;
+            if (useSchema)
+                rtn = _defaultSchemaEditor;
+             else
+		        rtn = _default;
 		}
-		
 		return rtn;
 		
 	}
-	
-	/*public MerlotDOMEditor getEditor(String nodeName, 
-									 MerlotDOMNode node, 
-									 MerlotPlugin plugin) 
-	{
-		MerlotDOMEditor ret = null;
-
-		// first see if the node has a plugin editor associated with it
-		if (plugin instanceof MerlotDTDPlugin) {
-			ret = ((MerlotDTDPlugin)plugin).getEditor(nodeName,node);
-		}
-		
-		
-		// if the plugin didn't return us an editor, try the global table
-		if (ret == null) {
-			if (nodeName != null) {
-				Object o = _globalEditors.get(nodeName);
-				if (o instanceof MerlotDOMEditor) {
-					ret = (MerlotDOMEditor)o;
-				}
-			}
-		}
-		// still didn't find one? see if the plugin has a default
-		if (ret == null && plugin != null) {
-			ret = ((MerlotDTDPlugin)plugin).getDefaultEditor(node);
-		}
-		// nope? use the global default
-		if (ret == null) {
-			ret = _default;
-		}
-		
-		return ret;
-		
-		
-	}*/
-	
-
 	
 }

@@ -55,10 +55,15 @@ http://www.merlotxml.org.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Stack;
+import java.util.Vector;
 
-import org.w3c.dom.*;
+import org.merlotxml.merlot.MerlotDebug;
+import org.merlotxml.util.xml.xerces.DTDDocumentImpl;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Container for a validated Document and it's DTDDocuments
@@ -66,7 +71,6 @@ import org.w3c.dom.*;
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: ValidDocument.java,v 1.9 2001/08/14 15:47:27 camk Exp $
  */
 
 public class ValidDocument 
@@ -97,6 +101,8 @@ public class ValidDocument
     /** Stack for keeping track of multiple DTD's used by a document */
     private Stack _dtdStack;
     
+    private Vector _grammars = new Vector();
+    private GrammarDocument _grammarDocument = null;
 	
 	public ValidDocument () 
 	{
@@ -148,6 +154,20 @@ public class ValidDocument
 		_dtdStack.push(cachedDTD);
 		
 	
+    }
+    
+    public void setGrammarDocument(GrammarDocument grammarDocument) {
+        _grammarDocument = grammarDocument;
+        // Temporary measure while changing grammar.
+        if (_maindtd != null && _maindtd instanceof DTDDocumentImpl) {
+            ((DTDDocumentImpl)_maindtd).setGrammarDocument(grammarDocument);
+        } else
+        MerlotDebug.msg("Cannot set GrammarDocument in DTDDocumentImpl.");
+    }
+    
+    public GrammarDocument getGrammarDocument()
+    {
+        return _grammarDocument;
     }
     
     /**

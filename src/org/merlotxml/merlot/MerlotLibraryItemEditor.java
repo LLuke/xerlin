@@ -55,11 +55,6 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.event.*;
-
-import java.io.*;
-import javax.swing.*;
-import org.w3c.dom.*;
 
 
 /**

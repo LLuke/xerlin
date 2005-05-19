@@ -52,7 +52,9 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.util.xml;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * This contains information we need to keep with a dtd that has been
@@ -61,8 +63,7 @@ import java.util.*;
  * @author Kelly A. Campbell
  */
 
-public class DTDCacheEntry implements Comparable
-{
+public class DTDCacheEntry implements Comparable {
     /**
      * The publicId
      */
@@ -81,119 +82,118 @@ public class DTDCacheEntry implements Comparable
      * or a path into a jar, including a ! if the file
      */
     protected String _filePath = null;
-	
+
     /**
      * last modification time of the file the dtd was loaded from. if this is 0, then we cache
      * the file indefinitely, and never check back with the source
      */
-    protected long   _timestamp = 0; 
+    protected long _timestamp = 0;
 
     /**
      * cached char array of the dtd stream
      */
     protected char[] _cachedDTDStream;
-	
+
     /**
      * a parsed version of the dtd
      */
-    protected DTDDocument _parsedDTD = null; // this could be a weak ref if we want to reduce
-				// some memory overhead
+    protected DTDDocument _parsedDTD = null;
+    // this could be a weak ref if we want to reduce
+    // some memory overhead
 
-    public DTDCacheEntry(String publicId, String systemId) 
-    {
-	_publicId = publicId;
-	_systemId = systemId;
-	    
-    }
-    public void setPublicId(String s) 
-    {
-	_publicId = s;
-    }
-    public void setSystemId(String s) 
-    {
-	_systemId = s;
-    }
-    public String getPublicId() 
-    {
-	return _publicId;
-    }
-    public String getSystemId() 
-    {
-	return _systemId;
-    }
-	
-    public void setFilePath(String s) 
-    {
-	_filePath = s;
-    }
-    public String getFilePath() 
-    {
-	return _filePath;
-    }
-	
-    public void setTimestamp(long t) 
-    {
-	_timestamp = t;
-    }
-    public long getTimestamp() 
-    {
-	return _timestamp;
-    }
-    public void setCachedDTDStream(char[] s) 
-    {
-	_cachedDTDStream = s;
-    }
-    public char[] getCachedDTDStream() 
-    {
-	return _cachedDTDStream;
-    }
-    public void setParsedDTD(DTDDocument parsedDTD) 
-    {
-	_parsedDTD = parsedDTD;
-    }
-    public DTDDocument getParsedDTD() 
-    {
-	return _parsedDTD;
-    }
-    public String toString() 
-    {
-	return "DTDCacheEntry(public="+_publicId+" system="+_systemId+" file="+_filePath+" cachedDTDStream is "+(_cachedDTDStream != null?"non-":"")+"null)";
-	    
-	    
-    }
-	
-    public List getPossibleRootNames() 
-    {
-	Enumeration e = _parsedDTD.getElements();
-	ArrayList list = new ArrayList();
-	while (e.hasMoreElements()) {
-	    DTDElement el = (DTDElement)e.nextElement();
-	    String s = el.getName();
-	    list.add(s);
-	}
-	return list;
-		
-    }
-    
+    public DTDCacheEntry(String publicId, String systemId) {
+        _publicId = publicId;
+        _systemId = systemId;
 
-    public int compareTo(Object o) 
-	throws ClassCastException
-    {
-	int rtn = 0;
-	if (o instanceof DTDCacheEntry) {
-	    DTDCacheEntry entry = (DTDCacheEntry)o;
-	    if (_publicId != null && entry != null && entry._publicId != null) {
-		rtn = _publicId.compareTo(entry._publicId);
-	    }
-	    if (rtn == 0 && _systemId != null && entry != null && entry._systemId != null) {
-		rtn = _systemId.compareTo(entry._systemId);
-	    }
-	    return rtn;
-	}
-	else {
-	    throw new ClassCastException();
-	}
-		
     }
-    
+    public void setPublicId(String s) {
+        _publicId = s;
+    }
+    public void setSystemId(String s) {
+        _systemId = s;
+    }
+    public String getPublicId() {
+        return _publicId;
+    }
+    public String getSystemId() {
+        return _systemId;
+    }
+
+    public void setFilePath(String s) {
+        _filePath = s;
+    }
+    public String getFilePath() {
+        return _filePath;
+    }
+
+    public void setTimestamp(long t) {
+        _timestamp = t;
+    }
+    public long getTimestamp() {
+        return _timestamp;
+    }
+    public void setCachedDTDStream(char[] s) {
+        _cachedDTDStream = s;
+    }
+    public char[] getCachedDTDStream() {
+        return _cachedDTDStream;
+    }
+    public void setParsedDTD(DTDDocument parsedDTD) {
+        _parsedDTD = parsedDTD;
+    }
+    public DTDDocument getParsedDTD() {
+        return _parsedDTD;
+    }
+    public String toString() {
+        return "DTDCacheEntry(public="
+            + _publicId
+            + " system="
+            + _systemId
+            + " file="
+            + _filePath
+            + " cachedDTDStream is "
+            + (_cachedDTDStream != null ? "non-" : "")
+            + "null)";
+
+    }
+
+    public List getPossibleRootNames() {
+        Enumeration e = _parsedDTD.getElements();
+        ArrayList list = new ArrayList();
+        while (e.hasMoreElements()) {
+            Object o = e.nextElement();
+            if (o instanceof String)
+                list.add(o);
+            else if (o instanceof DTDElement){
+                DTDElement el = (DTDElement)o;
+                String s = el.getName();
+                list.add(s);
+            }
+        }
+        return list;
+
+    }
+
+    public int compareTo(Object o) throws ClassCastException {
+        int rtn = 0;
+        if (o instanceof DTDCacheEntry) {
+            DTDCacheEntry entry = (DTDCacheEntry) o;
+            if (_publicId != null
+                && entry != null
+                && entry._publicId != null) {
+                rtn = _publicId.compareTo(entry._publicId);
+            }
+            if (rtn == 0
+                && _systemId != null
+                && entry != null
+                && entry._systemId != null) {
+                rtn = _systemId.compareTo(entry._systemId);
+            }
+            return rtn;
+        } else {
+            throw new ClassCastException();
+        }
+
+    }
+
 }

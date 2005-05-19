@@ -52,11 +52,25 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin;
 
-import java.io.*;
-import java.util.*;
-import java.util.zip.*;
-import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
 import org.merlotxml.merlot.XMLEditorSettings;
 
 /**
@@ -74,7 +88,6 @@ import org.merlotxml.merlot.XMLEditorSettings;
  *
  * @author Kelly Campbell
  * @author Tim McCune
- * @version $Id: PluginClassLoader.java,v 1.25 2001/10/24 19:13:07 camk Exp $
  */
 
 public class PluginClassLoader extends ClassLoader 
@@ -353,9 +366,9 @@ public class PluginClassLoader extends ClassLoader
     {
 		if (_embeddedZipFiles == null) { // assumes one PluginClassLoader per plugin zip file
 			_embeddedZipFiles = new ArrayList();
-			Enumeration enum = zip.entries();
-			while (enum.hasMoreElements()) {
-				ZipEntry je = (ZipEntry) enum.nextElement();
+			Enumeration en = zip.entries();
+			while (en.hasMoreElements()) {
+				ZipEntry je = (ZipEntry) en.nextElement();
 				if (je.getName().startsWith(DIR_LIB)) {
 					ZipFile childZip;
 					int nameStartsAt = je.getName().lastIndexOf('/');
@@ -438,9 +451,9 @@ public class PluginClassLoader extends ClassLoader
 		}
 		if (unzip) {
 			ZipFile zip = new ZipFile(f);
-			Enumeration enum = zip.entries();
-			while (enum.hasMoreElements()) {
-				ZipEntry je = (ZipEntry) enum.nextElement();
+			Enumeration en = zip.entries();
+			while (en.hasMoreElements()) {
+				ZipEntry je = (ZipEntry) en.nextElement();
 				ZipFile childZip;
 				//	System.out.println("entry: "+je);
 				if (je.isDirectory()) {

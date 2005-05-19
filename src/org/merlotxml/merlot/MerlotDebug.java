@@ -55,11 +55,9 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import org.w3c.dom.*;
+import java.util.Properties;
 
-import java.util.*;
-
-import org.merlotxml.util.*;
+import org.w3c.dom.DOMException;
 
 
 /**

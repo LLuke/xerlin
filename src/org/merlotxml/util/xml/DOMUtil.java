@@ -55,15 +55,23 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.util.*;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.CDATASection;
+import org.w3c.dom.Comment;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.EntityReference;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 /**
  * DOM Utilities
  * 
  * @author Tim McCune
- * @version $Id: DOMUtil.java,v 1.4 2000/06/24 17:58:55 camk Exp $
  */
 
 public class DOMUtil {

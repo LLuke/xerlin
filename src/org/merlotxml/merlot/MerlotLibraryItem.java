@@ -55,9 +55,10 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 
 /**

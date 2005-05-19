@@ -57,20 +57,44 @@ http://www.channelpoint.com/merlot.
 //
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
-import org.merlotxml.merlot.plugin.*;
-import org.merlotxml.merlot.plugin.dtd.*;
-import org.merlotxml.util.xml.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
+import javax.swing.Icon;
+import javax.swing.JPanel;
+
+import org.merlotxml.merlot.plugin.dtd.DTDPluginConfig;
+import org.merlotxml.merlot.plugin.dtd.DisplayTextConfig;
+import org.merlotxml.merlot.plugin.dtd.PluginDTDCacheEntry;
+import org.merlotxml.util.xml.DOMUtil;
+import org.merlotxml.util.xml.DTDAttribute;
+import org.merlotxml.util.xml.DTDCacheEntry;
+import org.merlotxml.util.xml.DTDConstants;
+import org.merlotxml.util.xml.DTDDocument;
+import org.merlotxml.util.xml.GrammarComplexType;
+import org.merlotxml.util.xml.GrammarDocument;
+import org.merlotxml.util.xml.GrammarSimpleType;
+import org.merlotxml.util.xml.ValidDocument;
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Comment;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.DocumentType;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 
 /**
@@ -122,6 +146,9 @@ public class MerlotDOMNode
      */
     protected DTDPluginConfig _dtdPluginConfig;
 
+    MerlotDOMEditor _editor = null;
+    
+    GrammarComplexType _grammarComplexType = null;
 
     public MerlotDOMNode (Node data, XMLFile file) 
     {
@@ -133,7 +160,7 @@ public class MerlotDOMNode
 		_file = file;
 		_listeners = new Vector();
         if (file!=null)
-		    _file.putInstanciatedNode( data, this );
+		    XMLFile.putInstanciatedNode( data, this );
 	
 		
     }
@@ -240,18 +267,30 @@ public class MerlotDOMNode
      * one is found, otherwise a default one should be returned.
      */
     public MerlotDOMEditor getEditor() {
-	MerlotDOMEditor editor = null;
-	MerlotEditorFactory editFactory = MerlotEditorFactory.getInstance();
-	try {
-	    return editFactory.getEditor(this.getNodeName(), this.getDTDPluginConfig());
-	}
-	catch (IllegalAccessException e) {
-	    return null;
-	}
-	catch (InstantiationException e) {
-	    return null;
-	}
-	
+        if (_editor != null)
+            return _editor;
+        MerlotDOMEditor editor = null;
+        MerlotEditorFactory editFactory = MerlotEditorFactory.getInstance();
+        try {
+	    	boolean useSchema = false;
+	    	GrammarDocument grammarDocument = getGrammarDocument();
+        	if (grammarDocument instanceof
+            	org.merlotxml.util.xml.xerces.SchemaGrammarDocumentImpl)
+            useSchema = true;
+            editor = editFactory.getEditor(this.getNodeName(), this.getDTDPluginConfig(), useSchema);
+        }
+        catch (IllegalAccessException e) {
+            MerlotDebug.msg("MerlotDOMNode.getEditor(): " + e);
+            return null;
+        }
+        catch (InstantiationException e) {
+            MerlotDebug.msg("MerlotDOMNode.getEditor(): " + e);
+            return null;
+        }
+        String editorClass = editor.getClass().getName();
+        //MerlotDebug.msg("Editor class: " + editorClass);
+        _editor = editor;
+        return editor;
     }
 
     public String getNodeName() 
@@ -323,7 +362,6 @@ public class MerlotDOMNode
 			if (_theNode != null) {
 				NodeList list = _theNode.getChildNodes();
 				int len = list.getLength();
-				Vector v = new Vector();
 				
 				if (len > 0) {
 					if (DEBUG) {
@@ -449,10 +487,10 @@ public class MerlotDOMNode
     */
 	/**
 	 * returns the nodes that are insertable at the given index.
+     * @deprecated Use getGrammarComplexType().getInsertableElements(index)
 	 */
 	public Enumeration getInsertableElements(int index) 
 	{
-		
 		Enumeration e = null;
 		if (this instanceof MerlotDOMElement) {
 		    try {
@@ -465,15 +503,14 @@ public class MerlotDOMNode
 		}
 
 		return e;
-		
 	}
-	
+    
 	/**
 	 * returns the nodes that are insertable at any index.
+     * @deprecated Use getGrammarComplexType().getInsertableElements()
 	 */
 	public Enumeration getInsertableElements() 
 	{
-		
 		Enumeration e = null;
 		if (this instanceof MerlotDOMElement) {
 		    try {
@@ -486,9 +523,7 @@ public class MerlotDOMNode
 		}
 
 		return e;
-		
 	}
-	
 
 	/**
 	 * Returns true if the child is a valid type to be a child of this
@@ -510,6 +545,12 @@ public class MerlotDOMNode
     }
 
     public boolean isAllowableChild (String child, int index) {
+        GrammarComplexType complexType = getGrammarComplexType();
+        if (complexType == null)
+            return false;
+        if (child.equals("#text") && complexType != null)
+            return complexType.getIsSimpleContentAllowed();
+        /*
         Enumeration e;
         if (index>=0)
             e = getInsertableElements (index);
@@ -525,6 +566,19 @@ public class MerlotDOMNode
             if (elname == null)
                 return false;
             if (elname.equals(child))
+                return true;
+        }
+        */
+        GrammarComplexType[] insertables;
+        if (index >= 0)
+            insertables = complexType.getInsertableElements(getRealNode(), index);
+        else
+            insertables = complexType.getInsertableElements(getRealNode());
+        if (insertables == null)
+            return false;
+        for (int i = 0; i < insertables.length; i++) {
+            GrammarComplexType insertable = insertables[i];
+            if (insertable.getName().equals(child))
                 return true;
         }
         return false;
@@ -789,13 +843,20 @@ public class MerlotDOMNode
 		    Element parent = (Element)_theNode;
 		    DTDDocument dtd = _file.getValidDocument().getDTDForElement( parent );
 		    String childName = child.getNodeName();
-		    int insertPosition = dtd.getInsertPosition( parent, childName );
-		    if ( appendPosition > insertPosition )
-		    {   
-			    System.out.println( "Doing insert instead of append." );
-			    insertChildAt( child, insertPosition );
-			    return;
-		    }
+		    //int insertPosition = dtd.getInsertPosition( parent, childName );
+            GrammarComplexType complexType = getGrammarComplexType();
+            if (complexType != null) {
+            	int insertPosition = getGrammarComplexType().getInsertPosition(parent, childName);
+                	if (insertPosition == -1) {
+                    	MerlotDebug.msg("Not appending child - child not allowed here.");
+                    	return;
+                	}
+		    	if ( appendPosition > insertPosition ) {   
+			        MerlotDebug.msg( "Doing insert instead of append." );
+			    	insertChildAt( child, insertPosition );
+			    	return;
+		    	}
+        	}
         }
 		try {
 			_theNode.appendChild(child._theNode);
@@ -883,7 +944,6 @@ public class MerlotDOMNode
 		int[] myIndices = nd.getIndices();
 		MerlotDOMNode[] myNodes = nd.getNodes();
 		
-
 		getRealNode().removeChild(nd.getRealNode());
 		nd.setParentNode(null);
 
@@ -984,8 +1044,8 @@ public class MerlotDOMNode
 			ret = null;
 		}
 		// we only show blank TextNodes if they were created in Merlot 
-		if (ret instanceof MerlotDOMText && 
-		    !nodename.equals(DTDConstants.PROCESSING_INSTRUCTION_KEY)) {
+		if (ret instanceof MerlotDOMText 
+            && !this.getNodeName().equals(DTDConstants.PROCESSING_INSTRUCTION_KEY)) {
 			((MerlotDOMText)ret).setVisible(true);
 		}
 				
@@ -1002,13 +1062,14 @@ public class MerlotDOMNode
 		case Node.ELEMENT_NODE:
 			if (nd.getNodeName().equals("libitem")) {
 				ret = new MerlotLibraryItem((Element)nd,_file);
-			}
-			else{
+            } else {
 				ret = new MerlotDOMElement((Element)nd,_file);
                 // Set default attributes here
                 XMLEditorSettings xes = XMLEditorSettings.getSharedInstance();
-                boolean writeDefaults =
-                    xes.getProperty("merlot.write.default-atts").equals("true");
+                boolean writeDefaults = true;
+                String writeDefaultsProperty = xes.getProperty("merlot.write.default-atts");
+                if (writeDefaultsProperty != null)
+                    writeDefaults = writeDefaultsProperty.equals("true");
                 if (_file!=null && writeDefaults) {
                     DTDAttribute attr;
                     Enumeration e = ret.getDTDAttributes();
@@ -1018,7 +1079,8 @@ public class MerlotDOMNode
                             attr = (DTDAttribute)e.nextElement();
                             t = attr.getType();
 
-                            if (t==DTDConstants.TOKEN_GROUP) {
+                            if (t==DTDConstants.TOKEN_GROUP 
+                                || t==DTDConstants.CDATA) {
                                 String name = attr.getName();
                                 String defaultValue = attr.getDefaultValue();
                                 if (((MerlotDOMElement)ret).
@@ -1034,18 +1096,16 @@ public class MerlotDOMNode
 			break;
 		case Node.TEXT_NODE:
 		    String s = ((Text)nd).getData();
-		    if (s.equals(DTDConstants.PROCESSING_INSTRUCTION_KEY)) {
+		    if (s!=null && s.equals(DTDConstants.PROCESSING_INSTRUCTION_KEY)) {
 			ret = new MerlotDOMProcessingInstruction(nd,_file);
-		    }
-		    else {
+            } else {
 			ret = new MerlotDOMText((Text)nd,_file);
 		    }
 		    if (s != null) {
 			s = s.trim();
 			if ( s.equals("")) {
 			    ((MerlotDOMText)ret).setVisible(false);
-			}
-			else {
+                } else {
 			    ((MerlotDOMText)ret).setVisible(true);
 			}
 			
@@ -1109,20 +1169,80 @@ public class MerlotDOMNode
 
     }
 	
-			
+    /**
+     * @deprecated Use getGrammarDocument.
+     */
 	public DTDDocument getDTDDocument()
 	{
 		ValidDocument doc = _file.getValidDocument();
 		return doc.getDTDForElement( this.getNodeName() );
 	}
-
+    
+    /**
+     * @deprecated Use getGrammarAttributes
+     */
     public Enumeration getDTDAttributes()
     {
 		Enumeration e = _file.getDTDAttributes(this.getNodeName());
 		return e;
     }
-		
+    
+    /**
+     * Provides access to element and attribute grammar for both
+     * DTDs and Schemas.
+     */
+    public GrammarDocument getGrammarDocument() {
+		ValidDocument doc = _file.getValidDocument();
+        return doc.getGrammarDocument();
+    }
 
+    /**
+     * Provides access to element grammar for both
+     * DTDs and Schemas.
+     */
+    public GrammarComplexType getGrammarComplexType() {
+        if (_grammarComplexType != null)
+            return _grammarComplexType;
+        GrammarComplexType ret = null;
+        GrammarDocument grammarDocument = getGrammarDocument();
+        if (grammarDocument==null) {
+            //MerlotDebug.msg("GrammarDocument is null for " + getNodeName());
+            return null;
+        }
+        GrammarComplexType parentComplexType = null;
+        MerlotDOMNode parent = getParentNode();
+        if (parent != null)
+            parentComplexType = parent.getGrammarComplexType();
+        ret = grammarDocument.getGrammarComplexType(parentComplexType, getNodeName());
+        if (ret == null) {
+            //MerlotDebug.msg("Complex type is null for " + getNodeName());
+        }
+        _grammarComplexType = ret;
+        return ret;
+    }
+    
+    /**
+     * Provides access to the grammar of the attributes defined for this node
+     * for both DTDs and Schemas.
+     */
+    public GrammarSimpleType[] getGrammarAttributes() {
+        GrammarComplexType complexType = getGrammarComplexType();
+        if (complexType == null) {
+            MerlotDebug.msg("ComplexType is null for node " + getNodeName());
+            return new GrammarSimpleType[0];
+        }
+        return complexType.getAttributes();
+    }
+
+    public GrammarSimpleType getGrammarAttribute(String name) {
+        GrammarComplexType complexType = getGrammarComplexType();
+        if (complexType == null) {
+            MerlotDebug.msg("ComplexType is null for node " + getNodeName());
+            return null;
+        }
+        return complexType.getAttribute(name);
+    }
+    
     public JPanel getEditPanel()
 	throws InstantiationException, IllegalAccessException
     {
@@ -1249,7 +1369,6 @@ public class MerlotDOMNode
 		// Can't see any reason for allowing duplicates -- Evert
 		if ( ! _listeners.contains( l ) )
 			_listeners.addElement(l);
-				
     }
 	public void removeMerlotNodeListener(MerlotNodeListener l)
 	{
@@ -1318,11 +1437,6 @@ public class MerlotDOMNode
 		
 		MerlotDebug.msg("getParent = "+getParentNode()+" parent.getParent() = "+parent.getParentNode());
 		
-		// Revalidate the element in order to show the correct colour in the
-		// tree
-		if ( parent instanceof MerlotDOMElement )
-			((MerlotDOMElement)parent).validate();
-			
 		parent.resetCache();
 		if ( parent != null && newchildren != null) {
 
@@ -1338,19 +1452,25 @@ public class MerlotDOMNode
 				if (newchildren[i] != null && newchildren[i]._listeners != null) {
 					v.addAll(newchildren[i]._listeners);
 				}
+                // Revalidate the element in order to show the correct colour in the
+                // tree
+                if (newchildren[i] instanceof MerlotDOMElement)
+                    ((MerlotDOMElement)newchildren[i]).resetValidation();
 			}
 
 			Enumeration e = v.elements();
+            Vector doneListeners = new Vector(v.size());
 			while (e.hasMoreElements()) {
 				Object o = e.nextElement();
 				MerlotDebug.msg("Node listener: "+o);
-				
+                if (doneListeners.contains(o))
+                   continue; 
+			    doneListeners.add(o);	
 				
 				if (o instanceof MerlotNodeListener) {
 					if (DEBUG) {
 						MerlotDebug.msg("notifying listener: "+o);
 					}
-					
 					
 					((MerlotNodeListener)o).nodeInserted(parent,childindices,newchildren);
 				}
@@ -1368,7 +1488,13 @@ public class MerlotDOMNode
 	 */
 	public void fireNodeDeleted() 
 	{
+        // Update the identity constraints
+
 		//MerlotDebug.msg("nodeDeleted(): "+this);
+        MerlotDOMNode parent = getParentNode();
+        if (parent instanceof MerlotDOMElement)
+            ((MerlotDOMElement)parent).resetValidationOfChildren();
+        
 		MerlotDOMNode[] children = getChildNodes();
 		if (children != null && children.length > 0) {
 			for (int i = 0; i<children.length;i++) {
@@ -1386,7 +1512,6 @@ public class MerlotDOMNode
 				}
 			}
 		}
-		
 	}
 	
 	/**
@@ -1400,7 +1525,7 @@ public class MerlotDOMNode
 		// Revalidate the element in order to show the correct colour in the
 		// tree
 		if ( parent instanceof MerlotDOMElement )
-			((MerlotDOMElement)parent).validate();
+			((MerlotDOMElement)parent).resetValidationOfChildren();
 			
 		if ( parent != null && oldchildren != null) {
 			Vector listeners = getMerlotNodeListeners();
@@ -1413,6 +1538,9 @@ public class MerlotDOMNode
 			// also notify listeners of the nodes being deleted
 			for (int i=0; i<oldchildren.length;i++) {
 				MerlotDebug.msg("oldchildren["+i+"] = "+oldchildren[i] + " oldchildren.listeners = "+oldchildren[i]._listeners);
+                
+                if (oldchildren[i] instanceof MerlotDOMElement)
+                    ((MerlotDOMElement)oldchildren[i]).resetValidation();
 				
 				if (oldchildren[i] != null && oldchildren[i]._listeners != null) {
 					MerlotDebug.msg("adding listeners for "+oldchildren[i]);
@@ -1441,8 +1569,12 @@ public class MerlotDOMNode
 	public void fireNodeChanged() 
 	{
 		MerlotDebug.msg("nodeChanged(): "+this);
+        
 		MerlotDOMNode parent = getParentNode();
 		
+        if (this instanceof MerlotDOMElement)
+            ((MerlotDOMElement)this).resetValidation();
+        
 		if ( parent != null ) {
 			Vector listeners = getMerlotNodeListeners();
 			Vector v = new Vector();
@@ -1467,9 +1599,9 @@ public class MerlotDOMNode
 			}
 			_file.setDirty(true);
 
-            MerlotDOMDocument mdd = getMerlotDOMDocument();
-            if (mdd!=null)
-                mdd._nodeDescription.remove(this);
+            if (getMerlotDOMDocument() != null) {
+            	getMerlotDOMDocument()._nodeDescription.remove(this);
+			}
 		}
 		
 	}
@@ -1478,14 +1610,24 @@ public class MerlotDOMNode
     public String toString() 
     {
 		StringBuffer sb = new StringBuffer();
-		//	sb.append(getClass()+":"+getNodeName());
-		sb.append(super.toString());
-		
+        sb.append(getClass()+":"+getNodeName());
+        //sb.append(super.toString());
+        
 		if (this instanceof MerlotDOMElement) {
 			sb.append(" {"+((MerlotDOMElement)this).getAttribute("name")+"}");
 		}
 		return sb.toString();
 		
+    }
+    
+    public String toPathString() {
+        StringBuffer ret = new StringBuffer();
+        MerlotDOMNode parent = this;
+        while (parent != null) {
+            ret.insert(0, ">" + parent.getNodeName());
+            parent = parent.getParentNode();
+        }
+        return ret.toString();
     }
 	
     public boolean equals (Object o) 
@@ -1519,10 +1661,8 @@ public class MerlotDOMNode
 	 */
 	public String getDescriptiveText() 
 	{
-        MerlotDOMDocument mdd = getMerlotDOMDocument();
-	    String description = null;
-        if (mdd!=null) 
-            description = (String)mdd._nodeDescription.get(this);
+	    String description = 
+            (String)getMerlotDOMDocument()._nodeDescription.get(this);
 
         if (description!=null)
             return description;
@@ -1542,9 +1682,8 @@ public class MerlotDOMNode
 		}
 		
 		description = getDescriptiveText( nodeProperties, defaultOrder );
-       
-        if (mdd!=null) 
-       	    mdd._nodeDescription.put(this,description);       
+        
+       	getMerlotDOMDocument()._nodeDescription.put(this,description);       
 
         return description;
 	}
@@ -1587,9 +1726,7 @@ public class MerlotDOMNode
      */
     public void setDescriptiveText(String description)
     {
-        MerlotDOMDocument mdd = getMerlotDOMDocument();
-        if (mdd!=null)
-            mdd._nodeDescription.put(this, description);
+        getMerlotDOMDocument()._nodeDescription.put(this, description);
     }
 	
 	public String toXMLShort()
@@ -1696,6 +1833,9 @@ public class MerlotDOMNode
 	public boolean isValid () {
 		return true;
 	}
+
+    public void removeAttributes() {
+    }
 	
 	public boolean locationIsValid (boolean checkParents) {
 	    // isValid() in MerlotDOMElement already checks for location. 
@@ -1716,5 +1856,9 @@ public class MerlotDOMNode
         return ret;
         */
 	}	
-		
+    
+    public boolean mayBeRemoved() {
+        // Refer to MerlotDOMElement.
+        return true;
+	}
 }

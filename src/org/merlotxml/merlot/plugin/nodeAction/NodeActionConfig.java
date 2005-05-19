@@ -52,15 +52,14 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.nodeAction;
 
-import java.util.*;
-import javax.swing.*;
 import java.awt.event.ActionListener;
 
-import org.merlotxml.merlot.*;
+import javax.swing.JMenuItem;
+
+import org.merlotxml.merlot.MerlotDOMNode;
+import org.merlotxml.merlot.XMLEditorActions;
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
-
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -69,7 +68,7 @@ import org.xml.sax.SAXException;
  * @author Tim McCune
  */
 public class NodeActionConfig {
-	
+
 	//Constants
 	protected static final String XPATH_TEXT = "/text()";
 	protected static final String XPATH_MENU = "menu" + XPATH_TEXT;
@@ -77,7 +76,7 @@ public class NodeActionConfig {
 	protected static final String XPATH_CONFIG = "config";
 	protected static final String XPATH_ICON = "icon" + XPATH_TEXT;
 	protected static final String XPATH_TOOL_TIP = "tooltip" + XPATH_TEXT;
-  
+
 	// Attributes
 	protected ClassLoader classLoader;
 	protected JMenuItem menu;
@@ -85,51 +84,57 @@ public class NodeActionConfig {
 	// Associations
 	protected NodeActionPluginConfig parent;
 	protected NodeAction myAction;
-	
+
 	protected ActionListener _listener = null;
 
 	// Operations
-	
+
 	public NodeActionConfig(ClassLoader classLoader) {
 		this.classLoader = classLoader;
 	}
-	
+
 	public NodeAction getNodeAction() {
 		return myAction;
 	}
-	
-  	public JMenuItem getMenuItem( MerlotDOMNode node ) {
-		menu.removeActionListener( _listener );
-		_listener = XMLEditorActions.getSharedInstance().new 
-		 PluginFireNodeAction( this, node );
-		menu.addActionListener( _listener );
-    	return menu;
-  	}
-	
-	public void parse(Node node) throws SAXException, IllegalAccessException,
-		InstantiationException, ClassNotFoundException
-	{
+
+	public JMenuItem getMenuItem(MerlotDOMNode node) {
+		menu.removeActionListener(_listener);
+		_listener =
+			XMLEditorActions.getSharedInstance().new PluginFireNodeAction(
+				this,
+				node);
+		menu.addActionListener(_listener);
+		return menu;
+	}
+
+	public void parse(Node node)
+		throws
+			SAXException,
+			IllegalAccessException,
+			InstantiationException,
+			ClassNotFoundException {
 		Node configNode;
 		String s;
-		
+
 		menu = new JMenuItem();
-		if ( (s = XPathUtil.getValue(node, XPATH_MENU)) != null) {
+		if ((s = XPathUtil.getValue(node, XPATH_MENU)) != null) {
 			menu.setText(s);
 		}
-		if ( (s = XPathUtil.getValue(node, XPATH_CLASS)) != null) {
+		if ((s = XPathUtil.getValue(node, XPATH_CLASS)) != null) {
 			myAction = (NodeAction) classLoader.loadClass(s).newInstance();
-			if ( (configNode = XPathUtil.selectSingleNode(node, XPATH_CONFIG)) != null) {
+			if ((configNode = XPathUtil.selectSingleNode(node, XPATH_CONFIG))
+				!= null) {
 				myAction.init(configNode);
 			}
 		}
-		if ( (s = XPathUtil.getValue(node, XPATH_ICON)) != null) {
+		if ((s = XPathUtil.getValue(node, XPATH_ICON)) != null) {
 			//Finish this later
 		}
-		if ( (s = XPathUtil.getValue(node, XPATH_TOOL_TIP)) != null) {
+		if ((s = XPathUtil.getValue(node, XPATH_TOOL_TIP)) != null) {
 			menu.setToolTipText(s);
 		}
 	}
-	
+
 	public String toString() {
 		StringBuffer rtn = new StringBuffer();
 		rtn.append("menuItem: " + menu + "\n");

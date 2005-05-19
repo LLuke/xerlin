@@ -1,5 +1,40 @@
-Changes 
+-------------------------------------------------------------------
+Xerlin 1.3_beta2
+-------------------------------------------------------------------
+- recent file list added [JL]
+- editor position and size is stored from session to session [JL]
+- tree-table column hide/show interface has been improved [JL]
+- the WebDAV filechooser has been enhanced [JL]
+- keyboard selection in popups now works [JL]
+- #REQUIRED TOKEN_GROUPS bug has been resolved [JL]
+- IDREF lists now automatically sorted [Rodion Rhitomirsky]
+- improved comment and processing-instruction handling [JL]
+- added new property merlot.auto.add.nodes when set Xerlin will automatically add any compulsory children of a newly added element [JL]
+- added examples directory containing example Schema and DTD files [EH]
+- improved schema editing panels [EH]
+- better handling of duplicate plugin [RD]
+- names and paste/before after issue resolved [JL]
+- improved Schema support [JL]
+- Xerlin in Japanese [MShift]
+
+-------------------------------------------------------------------
+Xerlin 1.3_beta1                                      Mar 29, 2003
+-------------------------------------------------------------------
+- Schema support [EH]
+- new Schema edit panel [EH]
+- WebDAV support [JL]
+- bug fixes [JL]
+
+-------------------------------------------------------------------
 Xerlin 1.2                                            Jun 29, 2002
+-------------------------------------------------------------------
+- the new XerlinPanel JComponent that enables integration of an XML editor
+into any java application [JL]
+- enhanced library support for the sharing of components between multiple
+XML files [JL]
+- cut/copy/pates improvements [EH, JL]
+- numerous bug fixes [EH, JL]
+
 -------------------------------------------------------------------
 Xerlin released
 1.1-alpha4 -> 1.1-beta1                               Oct 16, 2001

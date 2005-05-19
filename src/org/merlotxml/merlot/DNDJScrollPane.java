@@ -55,14 +55,14 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.util.*;
+import java.awt.Component;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 
-import javax.swing.*;
+import javax.swing.JScrollPane;
 
 
 /**
@@ -77,7 +77,6 @@ import javax.swing.*;
  * 
  * @author Kelly A. Campbell
  *
- * @version $Id: DNDJScrollPane.java,v 1.2 2000/03/07 04:46:14 camk Exp $
  *
  */
 public class DNDJScrollPane extends JScrollPane

@@ -55,16 +55,13 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
-import java.io.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import com.sun.javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.w3c.dom.*;
-
-import org.merlotxml.util.xml.*;
+import org.w3c.dom.Element;
 
 
 /**
@@ -74,8 +71,6 @@ import org.merlotxml.util.xml.*;
  *
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: MerlotNodeRenderer.java,v 1.6 2001/03/01 16:52:12 camk Exp $
  *
  */
 
@@ -138,6 +133,7 @@ public class MerlotNodeRenderer extends DefaultTreeCellRenderer
 			MerlotDOMNode nd = (MerlotDOMNode)value;
 
 			setIcon(nd.getSmallIcon());
+            /*
 			MerlotDOMNode parent = nd.getParentNode();
 
 			if (parent!=null && !parent.locationIsValid(true)) {
@@ -158,8 +154,30 @@ public class MerlotNodeRenderer extends DefaultTreeCellRenderer
 			} else if (!nd.isValid()) {
 				setForeground(Color.orange.darker());
 			} 
+            */
+            //MerlotDebug.msg("Rendering node: " + nd + " (" + nd.hashCode() + ")");
+            if (nd instanceof MerlotDOMElement) {
+                MerlotDOMElement element = (MerlotDOMElement)nd;
+                //MerlotDebug.msg(" getIsLocationValid: " + element.getIsLocationValid());
+                //MerlotDebug.msg(" getIsContentValid: " + element.getIsContentValid());
+                //MerlotDebug.msg(" getIsEachChildValid: " + element.getIsEachChildValid());
+                Element elem = (Element)nd.getRealNode();
+                //DTDDocument dtdd = nd.getXMLFile().getValidDocument().
+                //                                        getDTDForElement(elem);
+                if (!element.getHasBeenValidated())
+                    setForeground(Color.gray);
+                else if (!element.getIsLocationValid())
+                    setForeground(Color.magenta);
+                //else if (!element.getIsContentValid()
+                //        || (dtdd!=null && !dtdd.elementIsValid(elem, false)))
+                else if (!element.getIsContentValid() ||
+                          !element.getIsLocationValid() ||
+                          !element.getIsComplete())
+                    setForeground(Color.red);
+                else if (!element.getIsEachChildValid())
+                    setForeground(Color.orange.darker());
+            }
 		}
-		
 		return this;
     }
 

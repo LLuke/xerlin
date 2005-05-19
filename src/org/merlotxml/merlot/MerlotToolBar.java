@@ -55,20 +55,17 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.*;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import java.awt.event.*;
-
-import java.beans.*;
-
-import javax.swing.*;
-
-import javax.swing.event.*;
-import java.text.*;
-
-import java.util.*;
-
-import com.sun.javax.swing.*;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
 
 /**
  * Toolbar class that can hide the button text

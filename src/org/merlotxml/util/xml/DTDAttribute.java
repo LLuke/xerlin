@@ -55,8 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
 
 /**
  * This interface provides access to an attribute
@@ -66,7 +65,7 @@ import java.util.*;
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: DTDAttribute.java,v 1.3 2000/03/10 05:31:17 camk Exp $
+ * @deprecated Use GrammarSimpleType.
  */
 
 public interface DTDAttribute extends DTDConstants
@@ -75,6 +74,7 @@ public interface DTDAttribute extends DTDConstants
 	 * Returns the attribute name. i.e. &lt;!ATTLIST elname attname...
 	 * <P>
 	 * This would return "attname" in that case.
+     * @deprecated Use GrammarSimpleType.
 	 */ 
 	public String getName();
 	
@@ -82,23 +82,27 @@ public interface DTDAttribute extends DTDConstants
 	 * returns the attribute type, either ANY, CDATA, 
 	 * TOKEN_GROUP, NMTOKEN, NMTOKENS. 
 	 * see DTDConstants for these definitions.
+     * @deprecated Use GrammarSimpleType.
 	 */
 	public int getType();
 	
 	/**
 	 * returns an enumeration consisting of String objects that are the
 	 * tokens for this attribute definition
+     * @deprecated Use GrammarSimpleType.
 	 */
 	public Enumeration getTokens();
 	
 
 	/**
 	 * returns the default value if none is specified as a String
+     * @deprecated Use GrammarSimpleType.
 	 */
 	public String getDefaultValue();
 	
 	/**
 	 * Returns IMPLIED or REQUIRED, or NONE if nothing is specified
+     * @deprecated Use GrammarSimpleType.
 	 */
 	public int getDefaultType();
 	

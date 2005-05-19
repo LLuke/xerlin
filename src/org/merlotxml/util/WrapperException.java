@@ -54,8 +54,8 @@ http://www.channelpoint.com/merlot.
 // Copyright 1998, ChannelPoint, Inc., All Rights Reserved.
 
 package org.merlotxml.util;
-import java.lang.*;
-import java.io.*;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 /**
  * Wrapper Exception
@@ -64,7 +64,6 @@ import java.io.*;
  * implementations of custom interfaces
  * 
  * @author Tim McCune
- * @version $Id: WrapperException.java,v 1.6 2001/09/27 16:13:34 camk Exp $
  */
 
 public class WrapperException extends Exception {

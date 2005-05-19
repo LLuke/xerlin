@@ -55,16 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
+import org.w3c.dom.DocumentFragment;
 
 
 /**

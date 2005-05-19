@@ -53,11 +53,13 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Properties;
 
-import org.w3c.dom.*;
-import org.xml.sax.*;
+import org.w3c.dom.Document;
+import org.xml.sax.EntityResolver;
 
 /**
  * DOM Liaison
@@ -67,10 +69,9 @@ import org.xml.sax.*;
  * implementations of this interface.
  * 
  * @author Tim McCune
- * @version $Id: DOMLiaison.java,v 1.5 2000/08/21 21:44:48 timm Exp $
  */
 public interface DOMLiaison {
-
+	
 	/**
 	 * Create a Document
 	 * @return An empty Document

@@ -55,10 +55,6 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import javax.swing.*;
-
-import org.w3c.dom.*;
 
 //import com.channelpoint.commerce.pageserver.*;
 
@@ -69,8 +65,6 @@ import org.w3c.dom.*;
  *
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: MerlotException.java,v 1.2 2000/03/07 04:46:14 camk Exp $
  *
  */
 public class MerlotException extends Exception

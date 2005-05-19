@@ -55,12 +55,18 @@ http://www.merlotxml.org.
 
 package org.merlotxml.merlot;
 
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 
-import java.awt.event.*;
-import java.lang.reflect.*;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 
 import org.merlotxml.util.StringUtil;
 
@@ -317,10 +323,13 @@ public class MerlotResource
 	if (_keycodes == null) {
 	    loadKeyCodes();
 	}	
-	Object o = _keycodes.get(n);
-	if (o instanceof Integer) {
-	    return ((Integer)o).intValue();
-	}
+    if (_keycodes != null) {
+		Object o = _keycodes.get(n);
+		if (o instanceof Integer) {
+	    	return ((Integer)o).intValue();
+		}
+    }
+
 	return -1;
 				
     }

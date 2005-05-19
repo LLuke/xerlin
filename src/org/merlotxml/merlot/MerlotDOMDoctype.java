@@ -55,7 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import org.w3c.dom.*;
+import org.w3c.dom.DocumentType;
 
 
 /**

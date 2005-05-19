@@ -53,7 +53,8 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.util.xml;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This provides a mapping of XML character encoding types to java

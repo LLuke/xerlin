@@ -57,15 +57,12 @@ http://www.merlotxml.org/
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
 
 /**
  *  provides constant values
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: DTDConstants.java,v 1.6 2001/08/30 04:13:47 justin Exp $
  */
 
 public interface  DTDConstants
@@ -81,14 +78,16 @@ public interface  DTDConstants
 	
 	public static final int ANY      = 10;
 	public static final int EMPTY    = 11;
-	
 
 	public static final int TOKEN_GROUP = 12;
 	public static final int NMTOKEN     = 13;
 	public static final int NMTOKENS    = 14;
-    public static final int ID              = 15;
+    public static final int ID          = 15;
     public static final int IDREF       = 16;
-    
+    public static final int IDREFS      = 17;
+    public static final int ENTITY      = 18;
+    public static final int ENTITIES    = 19;
+    public static final int NOTATION    = 24;
 
 	public static final int CDATA    = 20;
 	public static final int PCDATA   = 21;

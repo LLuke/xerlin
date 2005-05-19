@@ -57,14 +57,6 @@ import java.io.*;
 import java.util.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
-/*
-import javax.swing.*;
-import javax.swing.text.*;
-import com.sun.javax.swing.*;
-
-import matthew.awt.StrutLayout;
-import com.ibm.xml.parser.*;
-*/
 import org.merlotxml.util.xml.*;
 
 /**
@@ -455,8 +447,9 @@ public class IDManager implements DTDConstants, MerlotNodeListener
 		{
 			XMLEditorSettings settings = XMLEditorSettings.getSharedInstance();
 			String logOn = settings.getProperty( "merlot.idmanager.log-last-modified" );
-			logOn = logOn.toLowerCase().trim();
-			if ( logOn.equals( "true" ) )
+            if (logOn != null)
+				logOn = logOn.toLowerCase().trim();
+			if (logOn != null && logOn.equals("true"))
 				_logOn = true;
 		}
 		return _logOn;

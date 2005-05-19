@@ -52,8 +52,8 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.nodeAction;
 
-import org.w3c.dom.*;
 import org.merlotxml.merlot.MerlotDOMNode;
+import org.w3c.dom.Node;
 
 /**
  * Merlot Pluggable Action Interface, where the action takes a MerlotDOMNode as

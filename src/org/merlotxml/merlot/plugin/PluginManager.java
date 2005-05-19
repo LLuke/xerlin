@@ -52,21 +52,40 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.zip.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
-import org.merlotxml.merlot.*;
-import org.merlotxml.merlot.plugin.action.*;
-import org.merlotxml.merlot.plugin.nodeAction.*;
-import org.merlotxml.merlot.plugin.dtd.*;
-import org.merlotxml.util.xml.*;
-import org.merlotxml.util.*;
-
-import org.w3c.dom.*;
-
+import org.merlotxml.merlot.MerlotConstants;
+import org.merlotxml.merlot.MerlotDebug;
+import org.merlotxml.merlot.MerlotResource;
+import org.merlotxml.merlot.XMLEditor;
+import org.merlotxml.merlot.XMLEditorSettings;
+import org.merlotxml.merlot.plugin.action.ActionPluginConfig;
+import org.merlotxml.merlot.plugin.dtd.DTDPluginConfig;
+import org.merlotxml.merlot.plugin.nodeAction.NodeActionPluginConfig;
+import org.merlotxml.util.FileUtil;
+import org.merlotxml.util.xml.DOMLiaisonImplException;
+import org.merlotxml.util.xml.ValidDocument;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
@@ -91,7 +110,6 @@ import org.xml.sax.SAXException;
  * 
  * @author Tim McCune
  * @author Kelly Campbell
- * @version $Id: PluginManager.java,v 1.14 2001/10/10 20:06:12 camk Exp $
  */
 
 public class PluginManager
@@ -301,19 +319,15 @@ public class PluginManager
 			}
 			nextZipFile.close();
 		}
-	
-		if (pc != null) {
-			//and add it to our list
-			if (_plugins.containsKey(pc.getName())) {
-				MessageFormat mf = new MessageFormat(ERR_DUP_PLUGIN);
-				String[] args = {pc.getName()};
-								
-				throw new PluginConfigException(mf.format(args));
-			}
-			//System.out.println("Added plugin: "+pc.getName());
-			
-			_plugins.put(pc.getName(),pc);
-		}
+
+        // Accept the first form of the plugin if there are multiple definitions.
+        if (pc != null && !  _plugins.containsKey(pc.getName()))  {
+            //and add it to our list
+            //System.out.println("Added plugin: "+pc.getName());
+            _plugins.put(pc.getName(),pc);
+        } else {
+            System.out.println("Duplicate plugin definition [" + pc.getName() +"] found. Accepting first instance encountered.");
+        }
 	}
 	
 	protected PluginConfig createPluginConfig(InputStream input,

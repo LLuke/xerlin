@@ -56,15 +56,20 @@ http://www.merlotxml.org/
 
 package org.merlotxml.awt;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.LayoutManager2;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * A LayoutManager that allows you to set the component's sizes as a percentage
  * of the total layout size. Based somewhat on StrutLayout by Matthew Phillips
  *
  * @author Kelly A. Campbell
- * @version $Id: PercentLayout.java,v 1.3 2000/03/10 05:31:16 camk Exp $
  *
  */
 public class PercentLayout implements LayoutManager2

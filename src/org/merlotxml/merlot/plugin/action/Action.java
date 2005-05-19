@@ -52,13 +52,13 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.action;
 
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 /**
  * Merlot Pluggable Action Interface
  *
  * @author Tim McCune
- * @version $Id: Action.java,v 1.2 2000/07/10 22:05:00 timm Exp $
  */
 public interface Action {
 	

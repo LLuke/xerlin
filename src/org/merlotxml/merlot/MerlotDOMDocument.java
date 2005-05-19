@@ -50,26 +50,19 @@ For information on the Merlot project, please see
 http://www.channelpoint.com/merlot.
 */
 
-
 // Copyright 1999 ChannelPoint, Inc., All Rights Reserved.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.merlotxml.util.xml.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
-import org.merlotxml.merlot.plugin.dtd.*;
-
-import org.w3c.dom.*;
-
+import org.merlotxml.util.xml.DTDConstants;
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
 
 /**
  * DOM document container for Merlot. Contains a DOM node, handles getting an
@@ -78,114 +71,96 @@ import org.w3c.dom.*;
  * cut and pasted.
  */
 
-public class MerlotDOMDocument extends MerlotDOMNode
-{
-	
+public class MerlotDOMDocument extends MerlotDOMNode {
+
 	/**
 	 * The IDManager for this document
 	 */
 	protected IDManager _idManager = null;
 
-    /** Node descriptors */
-    protected HashMap   _nodeDescription;
-	
-	public MerlotDOMDocument (Document data, XMLFile doc) 
-	{
+	/** Node descriptors */
+	protected HashMap _nodeDescription;
+
+	public MerlotDOMDocument(Document data, XMLFile doc) {
 		super(data, doc);
-        _nodeDescription = new HashMap();
+		_nodeDescription = new HashMap();
 	}
-	
-	public Document getDocument() 
-	{
-		return (Document)getRealNode();
+
+	public Document getDocument() {
+		return (Document) getRealNode();
 	}
-	
-	public MerlotDOMFragment createDocumentFragment() 
-	{
+
+	public MerlotDOMFragment createDocumentFragment() {
 		Document d = getDocument();
 		DocumentFragment df = d.createDocumentFragment();
-		return new MerlotDOMFragment(df,getXMLFile());
+		return new MerlotDOMFragment(df, getXMLFile());
 	}
-	
-	public IDManager getIdManager ()
-	{
+
+	public IDManager getIdManager() {
 		if (_idManager == null) {
 			_idManager = new IDManager(this);
-		}	
+		}
 		return _idManager;
-	}    
-	
-	public MerlotDOMNode getMerlotDOMNode( Node node )
-	{
-		MerlotDOMNode mNode = getXMLFile().getInstanciatedNode( node );
-		if ( mNode == null )
-			mNode = findMerlotDOMNode( node );
+	}
+
+	public MerlotDOMNode getMerlotDOMNode(Node node) {
+		MerlotDOMNode mNode = XMLFile.getInstanciatedNode(node);
+		if (mNode == null)
+			mNode = findMerlotDOMNode(node);
 		return mNode;
 	}
-	
+
 	/**
 	 * Finds the corresponding MerlotDOMNode for a Node.
 	 */
-	public MerlotDOMNode findMerlotDOMNode( Node node ) 
-	{
+	public MerlotDOMNode findMerlotDOMNode(Node node) {
 		long start = System.currentTimeMillis();
 		Object[] properties = new Object[1];
 		properties[0] = node;
-		SearchCriteria c = new SearchCriteria( properties ) 
-		{
-			public boolean match( MerlotDOMNode mNode ) 
-			{
+		SearchCriteria c = new SearchCriteria(properties) {
+			public boolean match(MerlotDOMNode mNode) {
 				boolean match = false;
 				Node testNode = mNode.getRealNode();
-				if ( testNode == (Node)this.properties[0] )
+				if (testNode == (Node) this.properties[0])
 					match = true;
 				return match;
 			}
 		};
-		MerlotDOMNode ret = findFirstDescendant( this, c );
+		MerlotDOMNode ret = findFirstDescendant(this, c);
 		long end = System.currentTimeMillis();
-		System.out.println( "GETTING MERLOTDOMNODE FOR NODE: " + (end-start) );
+		System.out.println("GETTING MERLOTDOMNODE FOR NODE: " + (end - start));
 		return ret;
 	}
-	
-	public MerlotDOMNode findNodeById( String id )
-	{
+
+	public MerlotDOMNode findNodeById(String id) {
 		//long start = System.currentTimeMillis();
 		MerlotDOMNode ret = null;
-		Node node = XPathUtil.getNodeById( getRealNode(), id );
-		if ( node == null )
-		{
-			ret = findNodeByIdSlow( id );
-		}
-		else
-		{
-			ret = getMerlotDOMNode( node );
+		Node node = XPathUtil.getNodeById(getRealNode(), id);
+		if (node == null) {
+			ret = findNodeByIdSlow(id);
+		} else {
+			ret = getMerlotDOMNode(node);
 		}
 		//long end = System.currentTimeMillis();
 		//System.out.println( "FINDING NODE BY ID: " + (end-start) );
 		return ret;
 	}
-	
+
 	/**
 	 * Finds the first node with the specified ID. If the document is not validated,
 	 * duplicate IDs might exist and this might return the wrong value.
 	 */
-	public MerlotDOMNode findNodeByIdSlow( String id ) 
-	{
+	public MerlotDOMNode findNodeByIdSlow(String id) {
 		Object[] properties = new String[1];
 		properties[0] = id;
-		SearchCriteria c = new SearchCriteria( properties ) 
-		{
-			public boolean match( MerlotDOMNode node ) 
-			{
+		SearchCriteria c = new SearchCriteria(properties) {
+			public boolean match(MerlotDOMNode node) {
 				boolean match = false;
-				Vector v = node.getAttributesOfType( DTDConstants.ID );
+				Vector v = node.getAttributesOfType(DTDConstants.ID);
 				Iterator it = v.iterator();
-				while ( it.hasNext() ) 
-				{
-					Node attribute = (Node)it.next();
-					if ( attribute.getNodeValue().equals(this.properties[0]) )
-					{
+				while (it.hasNext()) {
+					Node attribute = (Node) it.next();
+					if (attribute.getNodeValue().equals(this.properties[0])) {
 						match = true;
 						break;
 					}
@@ -193,45 +168,38 @@ public class MerlotDOMDocument extends MerlotDOMNode
 				return match;
 			}
 		};
-		MerlotDOMNode ret = findFirstDescendant( this, c );
+		MerlotDOMNode ret = findFirstDescendant(this, c);
 		return ret;
 	}
-	
-	public class SearchCriteria 
-	{
+
+	public class SearchCriteria {
 		Object[] properties;
-		public SearchCriteria( Object[] properties )
-		{
+		public SearchCriteria(Object[] properties) {
 			this.properties = properties;
 		}
-		public boolean match( MerlotDOMNode node ) 
-		{
+		public boolean match(MerlotDOMNode node) {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Visits nodes in the tree from the top down, but stops as soon as a node is
 	 * found that matches the criteria. Extend <code>SearchCriteria</code> in order to
 	 * do different searches.
 	 */
-	public MerlotDOMNode findFirstDescendant( MerlotDOMNode startNode, SearchCriteria c ) 
-	{
+	public MerlotDOMNode findFirstDescendant(
+		MerlotDOMNode startNode,
+		SearchCriteria c) {
 		MerlotDOMNode match = null;
-		if( startNode.getChildNodes() != null )
-      		{
+		if (startNode.getChildNodes() != null) {
 			MerlotDOMNode[] mlist = startNode.getChildNodes();
-		      	int childcount = mlist.length;
-	      		for( int i=0 ; i < childcount ; i++ )
-      			{
-      				if ( c.match( mlist[i] ) )
-				{
-            				match = mlist[i];
+			int childcount = mlist.length;
+			for (int i = 0; i < childcount; i++) {
+				if (c.match(mlist[i])) {
+					match = mlist[i];
 					break;
-				}
-				else 
-				{
-					match = findFirstDescendant( mlist[i], c );
+				} else {
+					match = findFirstDescendant(mlist[i], c);
 					if (match != null)
 						break;
 				}
@@ -239,27 +207,25 @@ public class MerlotDOMDocument extends MerlotDOMNode
 		}
 		return match;
 	}
-		
+
 	/**
 	 * Visits every node in the tree from the top down, and retrieves all nodes matching
 	 * the criteria. Extend <code>SearchCriteria</code> in order to do different searches.
 	 */
-	public Vector findAllDescendants( MerlotDOMNode startNode, SearchCriteria c ) 
-	{
+	public Vector findAllDescendants(
+		MerlotDOMNode startNode,
+		SearchCriteria c) {
 		Vector matches = new Vector();
-		if( startNode.getChildNodes() != null )
-      		{
+		if (startNode.getChildNodes() != null) {
 			MerlotDOMNode[] mlist = startNode.getChildNodes();
-		      	int childcount = mlist.length;
-	      		for( int i=0 ; i < childcount ; i++ )
-      			{
-      				if ( c.match( mlist[i] ) )
-				{
-            				MerlotDOMNode match = mlist[i];
-					matches.add( match );
+			int childcount = mlist.length;
+			for (int i = 0; i < childcount; i++) {
+				if (c.match(mlist[i])) {
+					MerlotDOMNode match = mlist[i];
+					matches.add(match);
 				}
-				Vector childMatches = findAllDescendants( mlist[i], c );
-				matches.addAll( childMatches );
+				Vector childMatches = findAllDescendants(mlist[i], c);
+				matches.addAll(childMatches);
 			}
 		}
 		return matches;

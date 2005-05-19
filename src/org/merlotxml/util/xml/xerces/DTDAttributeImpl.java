@@ -50,175 +50,65 @@ For information on the Merlot project, please see
 http://www.channelpoint.com/merlot.
 */
 
-
 // Copyright 1999 ChannelPoint, Inc., All Rights Reserved.
 
 package org.merlotxml.util.xml.xerces;
 
-import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
-import  org.merlotxml.util.xml.*;
+import org.apache.xerces.impl.dtd.XMLAttributeDecl;
+import org.merlotxml.util.xml.DTDAttribute;
+import org.merlotxml.util.xml.DTDConstants;
+import org.merlotxml.util.xml.GrammarSimpleType;
 
-import org.apache.xerces.validators.common.XMLAttributeDecl;
+//import org.apache.xerces.validators.common.XMLAttributeDecl;
 
 /**
  *  DTDAttribute
  * 
  *
  * @author Evert Hoff
- * @version 
  */
 
-public class DTDAttributeImpl implements DTDAttribute, DTDConstants
-{
+public class DTDAttributeImpl implements DTDAttribute, DTDConstants {
 	private DTDElementImpl _element = null;
 	private String _name = null;
 	private int _type = -2; // Not yet set.
 	private int _defaultType = -2;
 	private XMLAttributeDecl _decl = null;
-	
-	public DTDAttributeImpl( DTDElementImpl element, String name ) 
-	{
+	private GrammarSimpleType _simpleType = null;
+
+	public DTDAttributeImpl(DTDElementImpl element, String name) {
 		_element = element;
 		_name = name;
 	}
-	
-	public String getName() 
-	{
-		return _name;
-	}
-	
-	public XMLAttributeDecl getAttributeDecl()
-	{
-		if ( _decl == null )
-		{
-			GrammarAccess grammar
-		 	 = _element.getDTDDocumentImpl().getGrammarAccess();
-			_decl = grammar.getAttributeDecl( _element.getName(), _name );
-		}
-		return _decl;
-	}
-	
-	public int getType() 
-	{
-		if ( _type != -2 )
-			return _type;
-		XMLAttributeDecl decl = getAttributeDecl();
-		int declType = decl.type;
-		
-		switch ( declType ) 
-		{
-			// REVISIT: Not sure whether this one is correct
-			case XMLAttributeDecl.TYPE_ENUMERATION:
-				_type = TOKEN_GROUP;
-				break;
-			case XMLAttributeDecl.TYPE_CDATA:
-				_type = CDATA;
-				break;
-			// REVISIT: Have nothing for NMTOKENS
-			//case XMLAttributeDecl.:
-			//	return NMTOKENS;
-			case XMLAttributeDecl.TYPE_NMTOKEN:
-                _type = decl.list?DTDConstants.NMTOKENS:DTDConstants.NMTOKEN;
-				break;
-			case XMLAttributeDecl.TYPE_ID:
-				_type = ID;
-				break;
-			case XMLAttributeDecl.TYPE_IDREF:
-				_type = IDREF;
-				break;
-			case XMLAttributeDecl.TYPE_ENTITY:
-			case XMLAttributeDecl.TYPE_NOTATION:
-			// REVISIT: Do something with schema types
-			// Schema types
-			case XMLAttributeDecl.TYPE_SIMPLE:
-			case XMLAttributeDecl.TYPE_ANY_ANY:
-			case XMLAttributeDecl.TYPE_ANY_OTHER:
-			// Looks like this one disappeared from Xerces.
-			//case XMLAttributeDecl.TYPE_ANY_LOCAL:
-			case XMLAttributeDecl.TYPE_ANY_LIST:
-			default:
-				_type = NONE;
-		}
-		//System.out.println( "Xerces type: " + declType + " for " + _name );
-		//System.out.println( "Returning type: " + _type + " for " + _name );
-		return _type;
+
+	public DTDAttributeImpl(GrammarSimpleType simpleType) {
+		_simpleType = simpleType;
 	}
 
-	public int getDefaultType() 
-	{
-		if ( _defaultType != -2 )
-			return _defaultType;
-		XMLAttributeDecl decl = getAttributeDecl();
-		int declType = decl.defaultType;
-		switch ( declType ) 
-		{
-			case XMLAttributeDecl.DEFAULT_TYPE_IMPLIED:
-				_defaultType = IMPLIED;
-				break;
-			case XMLAttributeDecl.DEFAULT_TYPE_REQUIRED:
-				_defaultType = REQUIRED;
-				break;
-			case XMLAttributeDecl.DEFAULT_TYPE_DEFAULT:
-				_defaultType = NONE;
-				break;
-			// REVISIT
-			case XMLAttributeDecl.DEFAULT_TYPE_FIXED:
-                _defaultType = FIXED;
-                break;
-			case XMLAttributeDecl.DEFAULT_TYPE_PROHIBITED:
-			case XMLAttributeDecl.DEFAULT_TYPE_REQUIRED_AND_FIXED:
-			default:
-				_defaultType = NONE;
-		}
-		//System.out.println( "Returning default type: " + _defaultType + " for " + _name );
-		return _defaultType;
+	public String getName() {
+		return _simpleType.getName();
 	}
 
-	private boolean tokensLoaded = false;
-	//private Enumeration _tokens = null;
-	private List _literals = null;
-	
-	public Enumeration getTokens() 
-	{
-		if ( tokensLoaded )
-			return Collections.enumeration( _literals );
-		GrammarAccess grammar
-		 = _element.getDTDDocumentImpl().getGrammarAccess();
-		String[] literals = grammar.getEnumeration( _element.getName(), _name );
-		if ( literals == null )
-		{
-			_literals = new Vector();
-			return Collections.enumeration( _literals );
-		}
-		_literals = Arrays.asList( literals );
-		tokensLoaded = true;
-		return Collections.enumeration( _literals );
-		/*
-		Vector v;
-		
-		int t = getType();
-		switch (t) {
-		case TOKEN_GROUP:
-			return _attDef.elements();
-		case CDATA:
-			return null;
-		case NMTOKEN:
-			v = new Vector();
-			v.addElement(_attDef.elementAt(0));
-			return v.elements();
-		case NMTOKENS:
-			return _attDef.elements();
-		default:
-			return null;
-		}
-		*/
+	public int getType() {
+		return _simpleType.getType();
 	}
-	
-	public String getDefaultValue() 
-	{
-		XMLAttributeDecl decl = getAttributeDecl();
-		return decl.defaultValue;
+
+	public int getDefaultType() {
+		return _simpleType.getDefaultType();
+	}
+
+	public Enumeration getTokens() {
+		String[] strings = _simpleType.getEnumeration();
+		List list = Arrays.asList(strings);
+		return Collections.enumeration(list);
+	}
+
+	public String getDefaultValue() {
+		return _simpleType.getDefaultValue();
 	}
 }

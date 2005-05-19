@@ -55,8 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 
 
 /**

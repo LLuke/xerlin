@@ -52,23 +52,30 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import java.io.*;
-import java.net.URL;
-import java.util.*;
-import javax.swing.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import org.merlotxml.merlot.MerlotDebug;
-import org.merlotxml.merlot.plugin.*;
+import org.merlotxml.merlot.plugin.PluginConfig;
+import org.merlotxml.merlot.plugin.PluginConfigException;
+import org.merlotxml.merlot.plugin.PluginManager;
 import org.merlotxml.util.IconUtil;
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Merlot DTD Plugin Configuration
  * 
  * @author Tim McCune
- * @version	$Id: DTDPluginConfig.java,v 1.12 2002/07/18 06:16:10 justin Exp $
  */
 
 public class DTDPluginConfig extends PluginConfig {

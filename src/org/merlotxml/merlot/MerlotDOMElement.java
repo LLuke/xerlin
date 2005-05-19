@@ -55,19 +55,19 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import org.merlotxml.util.xml.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
-import org.apache.xerces.dom.DocumentImpl;
+import org.merlotxml.util.xml.DTDAttribute;
+import org.merlotxml.util.xml.DTDConstants;
+import org.merlotxml.util.xml.DTDDocument;
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.FieldNode;
+import org.merlotxml.util.xml.GrammarComplexType;
+import org.merlotxml.util.xml.GrammarSimpleType;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 /**
  * DOM element container for Merlot. Contains a DOM node, handles getting an
@@ -79,11 +79,23 @@ import org.apache.xerces.dom.DocumentImpl;
 public class MerlotDOMElement extends MerlotDOMNode
 {
 	
+    private static boolean _writeDefaults =
+        XMLEditorSettings.getSharedInstance().
+            getProperty("merlot.write.default-atts").equals("true");
+
+    private static boolean _autoAdd =
+        XMLEditorSettings.getSharedInstance().
+            getProperty("merlot.auto.add.nodes").equals("true"); 
 
 
 	public MerlotDOMElement(Element data, XMLFile doc) 
 	{
 		super(data,doc);
+        //Handle the auto adding of compulsory child elements
+        // Add compulsory children if the property merlot.auto.add.nodes is set
+        if (_autoAdd) {
+            constructNewNode(this);
+       }
 	}
 	
 	public boolean isElement() 
@@ -137,140 +149,289 @@ public class MerlotDOMElement extends MerlotDOMNode
 	 */
 	public void setAttribute(String name, String value) 
 	{
+        MerlotDebug.msg("Setting attribute " + name + " to " + value);
         XMLEditorSettings xes = XMLEditorSettings.getSharedInstance();
-        boolean writeDefaults =
-                    xes.getProperty("merlot.write.default-atts").equals("true");
 		boolean hasChanged = false;
 		Element el = (Element)_theNode;
+        GrammarSimpleType simpleType = getGrammarAttribute(name);
+        if (simpleType == null) {
+            MerlotDebug.msg("Can't set attribute: GrammarSimpleType is null.");
+            return;
+        }
+        Node valueNode = el.getAttributeNode(name);
+        FieldNode fieldNode = FieldNode.getFieldNode(el, valueNode, name);
+        if (value != null && value.equals("") && !simpleType.getIsRequired()) {
+            MerlotDebug.msg(" Value is empty and not required. Changing to null.");
+            value = null;
+        }
 		if (value != null) {
 			String oldValue = el.getAttribute( name );
-            DTDAttribute dtdAttr = getDTDAttribute( name );
-            int type = dtdAttr.getType();
+            //DTDAttribute dtdAttr = getDTDAttribute( name );
+            int type = simpleType.getType();
 			if ( !value.equals( oldValue ) 
-                || (writeDefaults && type==DTDConstants.TOKEN_GROUP))
+                || (_writeDefaults 
+                    && (type==DTDConstants.TOKEN_GROUP)
+                        || type==DTDConstants.CDATA))
 			{
-				el.setAttribute(name,value);
-				if ( type == DTDConstants.ID )
-				{
-					DocumentImpl docImpl = (DocumentImpl)getDocument();
-					// This updates Xerces' internal map of IDs versus Elements and
-					// allows the new id to be found with
-					// org.w3c.dom.Document.getElementById( String id )
-					// Xerces doesn't automatically update this map when an
-					// attribute is set.
-					docImpl.putIdentifier( name, el );
-				}
-				hasChanged = true;
-			} else if(dtdAttr.getDefaultType()==DTDConstants.FIXED) {
-                el.setAttribute(name,dtdAttr.getDefaultValue());
+                MerlotDebug.msg(" Setting attribute.");
+                el.setAttribute(name,value);
+                hasChanged = true;
+                
+                simpleType.setValue(fieldNode, value);
+
+			} else if(simpleType.getDefaultType()==DTDConstants.FIXED) {
+                MerlotDebug.msg(" Setting fixed value.");
+                el.setAttribute(name,simpleType.getDefaultValue());
+                hasChanged = true;
             }
 		}
 		else {
+            MerlotDebug.msg(" Removing attribute node.");
 			if ( el.getAttributeNode( name ) != null )
 			{
-				el.removeAttribute(name);
-				hasChanged = true;
+                el.setAttribute(name, null);
+                el.removeAttribute(name);
+                hasChanged = true;
 			}
+                
+            //Node valueNode = el.getAttributeNode(name);
+            //FieldNode fieldNode = FieldNode.getFieldNode(el, null, name);
+            simpleType.setValue(fieldNode, value);
 		}
 		
 		if ( hasChanged )
 			fireNodeChanged();
 	}
-	/*
-	public void setAttributes(HashMap h) 
-	{
-		Iterator i = h.keySet().iterator();
-		
-		while (i.hasNext()) {
-			String key = (String)i.next();
-			String val;
-			Object o = h.get(key);
-			if (o instanceof String) {
-				val = (String)o;
-			}
-			else if (o != null) {
-				val = o.toString();
-			}
-			else {
-				val = null;
-			}
-			if (val != null) {
-				//((Element)_theNode).setAttribute(key,val);
-				setAttribute( key, val );
-			}
-			else {
-				((Element)_theNode).removeAttribute(key);
-			}
-			
-		}
-		fireNodeChanged();
-		
-	}
-	*/
-	/**
-	 * sets the attributes one at a time
-	 */
-	/*
-	public void setAttribute(String name, String value) 
-	{
-		if (value != null) {
-			Element el = (Element)_theNode;
-			el.setAttribute(name,value);
-			DTDAttribute dtdAttr = getDTDAttribute( name );
-			int type = dtdAttr.getType();
-			if ( type == DTDConstants.ID )
-			{
-				DocumentImpl docImpl = (DocumentImpl)getDocument();
-				// This updates Xerces' internal map of IDs versus Elements and
-				// allows the new id to be found with
-				// org.w3c.dom.Document.getElementById( String id )
-				// Xerces doesn't automatically update this map when an
-				// attribute is set.
-				docImpl.putIdentifier( name, el );
-			}
-		}
-		else {
-			((Element)_theNode).removeAttribute(name);
-		}
-		
-		fireNodeChanged();
-	}
-	*/
-	
-	private boolean _valid = true;
-	private boolean _hasBeenValidated = false;
-	
+
+	private boolean _isLocationValid = true;
+    private boolean _isComplete = true;
+    private boolean _isContentValid = true;
+    private boolean _isEachChildValid = true;
+	public boolean _hasBeenValidated = false;
+
 	public boolean isValid ()
 	{
 		// Each element used to be validated each time the mouse moves over a
 		// node in the tree, now each one is validated once and thereafter only
 		// revalidated when a change occurs.
-		boolean valid;
-		if ( _hasBeenValidated )
-			valid = _valid;
-		else
-		{
-			valid = _file.elementIsValid((Element)_theNode, true);
-			_valid = valid;
-			_hasBeenValidated = true;
-		}
-		return valid;
+		if ( !_hasBeenValidated )
+			validate();
+		boolean ret = _isLocationValid && _isComplete && _isContentValid && _isEachChildValid;
+        return ret;
 	}
+    
+    public boolean getHasBeenValidated() {
+        return _hasBeenValidated;
+    }
+    
+    public boolean getIsLocationValid() {
+        return _isLocationValid;
+    }
+    
+    public boolean getIsComplete() {
+        return _isComplete;
+    }
+    
+    public boolean getIsContentValid() {
+        return _isContentValid;
+    }
+    
+    public boolean getIsEachChildValid() {
+        return _isEachChildValid;
+    }
 	
-	public void validate()
+	/**
+	 *  Adds element to queue in ValidationThread. 
+     *  validateNow() will be called to do the 
+     *  actual validation.
+     **/
+	public void validate() {
+        XMLFile file = _file;
+        XMLEditorDoc doc = _file.getXMLEditorDoc();
+        if (doc == null) {
+            MerlotDebug.msg("Can't validate " + getNodeName() + ". XMLEditorDoc is null.");
+            return;
+        }
+        ValidationThread validationThread = doc.getValidationThread();
+        validationThread.addElementToValidationQueue(this);
+    }
+    
+    /**
+     *  Called from ValidationThread
+     **/
+    public void validateNow() {
+        long start = System.currentTimeMillis();
+        //MerlotDebug.msg("Validating element " + getNodeName());
+        GrammarComplexType complexType = getGrammarComplexType();
+        if (complexType==null) {
+            MerlotDebug.msg("Not validating " + this + " because complexType is null.");
+            return;
+        }
+        Element el = (Element)_theNode;
+        _isLocationValid = complexType.getIsLocationValid(el);
+        _isComplete = complexType.getIsComplete(el);
+        _isContentValid = complexType.getIsSimpleContentValid(el) &&
+         complexType.getIsEachAttributeValid(el);
+        _isEachChildValid = true;
+        MerlotDOMNode[] children = getChildNodes();
+        for (int i = 0; i < children.length; i++) {
+            MerlotDOMNode child = children[i];
+            if (child instanceof MerlotDOMElement) {
+                _isEachChildValid = _isEachChildValid &&
+                 ((MerlotDOMElement)child).isValid();
+            }
+        }
+       boolean isValid = _isLocationValid && _isComplete && _isContentValid && _isEachChildValid;
+ 		_hasBeenValidated = true;
+        refreshNodeInTree();
+        if (!isValid) {
+            MerlotDebug.msg("Validated element " + getNodeName());
+            MerlotDebug.msg(" _isLocationValid: " + _isLocationValid);
+            MerlotDebug.msg(" _isComplete: " + _isComplete);
+            MerlotDebug.msg(" _isContentValid: " + _isContentValid);
+            MerlotDebug.msg(" _isEachChildValid: " + _isEachChildValid);
+        }
+        long end = System.currentTimeMillis();
+        MerlotDOMNode parent = getParentNode();
+        if (parent != null && parent instanceof MerlotDOMElement)
+            ((MerlotDOMElement)parent).resetValidation();
+	}
+    
+    /**
+     *  Determines if the minimum allowed instances of this element
+     *  will be violated if it is cut or deleted.
+     **/
+	public boolean mayBeRemoved()
 	{
-		_valid = _file.elementIsValid((Element)_theNode, true);
-		_hasBeenValidated = true;
+		boolean ret = true;
+        GrammarComplexType complexType = getGrammarComplexType();
+		int minOccurs = 0;
+        if (complexType != null) {
+            try {
+                minOccurs = getGrammarComplexType().getMinOccurs();
+            } catch (java.lang.UnsupportedOperationException ex) {
+                // If not yet implemented for DTDs
+                return true;
+            }
+        }
+		System.out.println("minOccurs: " + minOccurs);
+		if ( minOccurs > 0 )
+		{
+			int numberAfterRemove = getNumberOfPeersOfSameType() -1;
+			System.out.println( "numberAfterRemove: " + numberAfterRemove );
+			ret = numberAfterRemove >= minOccurs;
+		}
+		return ret;
 	}
+
+	/**
+	 * @return includes the current node
+	 **/
+	public int getNumberOfPeersOfSameType()
+	{
+		int ret = 0;
+		String thisNodeName = getNodeName();
+		Vector peers = getParentNode().getChildElements();
+		for ( int i = 0; i < peers.size(); i++ )
+		{
+			MerlotDOMElement peer = (MerlotDOMElement)peers.get(i);
+            if (peer.getNodeName().equalsIgnoreCase(thisNodeName) )
+				ret++;
+		}
+		return ret;
+	}
+
+    /**
+     * Called from MerlotDOMNode.fireNodeInserted to update.
+     */
+    public void resetValidation() {
+        // Reset this node
+        //MerlotDebug.msg("Resetting validation of " + this.toPathString());
+        _hasBeenValidated = false;
+        GrammarComplexType complexType = this.getGrammarComplexType();
+        if (complexType != null)
+            complexType.resetValidation((Element)this.getRealNode());
+        validate();
+        refreshNodeInTree();
+        
+        // Reset all parents of this node
+        MerlotDOMNode parent = getParentNode();
+        if (parent != null && parent instanceof MerlotDOMElement)
+            ((MerlotDOMElement)parent).resetValidation();
+    }
+    
+    public void resetValidationOfChildren() {
+        MerlotDOMNode[] children = getChildNodes();
+        for (int i = 0; i < children.length; i++) {
+            MerlotDOMNode child = children[i];
+            if (child instanceof MerlotDOMElement) {
+                ((MerlotDOMElement)child).resetValidation();
+            }
+        }
+    }
+    
+    public void refreshNodeInTree() {
+        XMLFile file = _file;
+        XMLEditorDoc doc = _file.getXMLEditorDoc();
+        if (doc == null) {
+            //MerlotDebug.msg("Cannot refresh node in tree: XMLEditorDoc is null.");
+            return;
+        }
+        DOMTreeTableAdapter tree = doc.getTreeTableModel();
+        try {
+            tree.refreshNode(this);
+        } catch (Exception ex) {
+            //MerlotDebug.msg("Exception refreshing node in tree: " + ex);
+        }
+    }
 	
+    /**
+     * @deprecated Use MerlotDOMNode.getGrammarComplexType.
+     */
 	public DTDElement getDTDElement()
 	{
 		DTDDocument dtd = getDTDDocument();
 		return dtd.fetchElement( this.getNodeName() );
 	}
 	
+    /**
+     * @deprecated Use GrammarComplexType.getAttribute(name)
+     */
 	public DTDAttribute getDTDAttribute( String name )
 	{
 		return getDTDElement().getAttribute( name );
 	}
+
+    private boolean constructNewNode(MerlotDOMNode node) {
+        if (!(node instanceof MerlotDOMElement))
+            return true;
+        MerlotDOMNode dummy;
+        GrammarComplexType complexType = getGrammarComplexType();
+        if (complexType==null) {
+            MerlotDebug.msg("Not doing constructNewNode on " + this + " because complexType is null.");
+            return true;
+        }
+        GrammarComplexType[] allowables = complexType.getInsertableElements(node.getRealNode());
+        boolean valid = complexType.getIsComplete((Element)node.getRealNode());
+            // Case of 1 allowable that is compulsory
+            Vector singleNodes = new Vector();
+
+            while (!valid && allowables.length == 1) {
+            dummy = node.newChild(allowables[0].getName());
+                singleNodes.add(dummy);
+            allowables = complexType.getInsertableElements(node.getRealNode());
+            valid = complexType.getIsComplete((Element)node.getRealNode());
+            }
+
+            for (int i = 0; i < singleNodes.size(); i++)
+                constructNewNode(
+                    (MerlotDOMNode) singleNodes.elementAt(i));
+
+            if (valid) {
+                return true;
+            }
+            return false;
+
+    }
 }
+

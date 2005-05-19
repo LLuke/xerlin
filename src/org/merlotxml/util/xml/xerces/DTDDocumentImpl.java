@@ -50,365 +50,350 @@ For information on the Merlot project, please see
 http://www.channelpoint.com/merlot.
 */
 
-
 // Copyright 1999 ChannelPoint, Inc., All Rights Reserved.
 
 package org.merlotxml.util.xml.xerces;
 
-import java.io.*;
-import java.util.*;
-import org.w3c.dom.*;
-import org.merlotxml.util.xml.*;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.xerces.dom.ASDOMImplementationImpl;
+import org.apache.xerces.dom.ASModelImpl;
+import org.apache.xerces.dom.DOMInputImpl;
+import org.apache.xerces.dom3.as.ASModel;
+import org.apache.xerces.dom3.as.DOMASBuilder;
+import org.apache.xerces.dom3.as.DOMImplementationAS;
+import org.apache.xerces.impl.xs.SchemaGrammar;
+import org.apache.xerces.impl.xs.XSModelImpl;
+import org.apache.xerces.xs.XSConstants;
+import org.apache.xerces.xs.XSElementDeclaration;
+import org.apache.xerces.xs.XSModel;
+import org.apache.xerces.xs.XSNamedMap;
+import org.merlotxml.util.xml.DTDCache;
+import org.merlotxml.util.xml.DTDCacheEntry;
+import org.merlotxml.util.xml.DTDDocument;
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.GrammarComplexType;
+import org.merlotxml.util.xml.GrammarDocument;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+//import org.w3c.dom.ls.DOMInputSource;
+import org.xml.sax.InputSource;
 
 /**
  * 
  *
  * @author Evert Hoff
- * @version 
  */
 
-public class DTDDocumentImpl implements DTDDocument
-{
-	private Hashtable _elements = null;
-	private boolean   _initialized = false;
+public class DTDDocumentImpl implements DTDDocument {
+    private Hashtable _elements = null;
+    private Hashtable _complexTypes = new Hashtable();
+    private boolean _initialized = false;
 
-    private String _pluginId;	
-	private String _publicId;
-	private String _systemId;
-	
-	private GrammarAccess _grammar;
+    private String _pluginId;
+    private String _publicId;
+    private String _systemId;
 
+    private GrammarDocument _grammarDocument = null;
 
-    public DTDDocumentImpl(String pluginId,  String publicId, String systemId )
-    {
+    /**
+     * @deprecated Use GrammarDocument.
+     */
+    public DTDDocumentImpl(String pluginId, String publicId, String systemId) {
         _pluginId = pluginId;
         _publicId = publicId;
         _systemId = systemId;
-        _grammar = new GrammarAccess( pluginId, systemId );
-        System.out.println( "Created Xerces DTDDocumentImpl: "
-        + getExternalID() );
+        System.err.println(
+            "Created Xerces DTDDocumentImpl: " + getExternalID());
     }
-	
-	public DTDDocumentImpl( String publicId, String systemId ) 
-	{
-		_publicId = publicId;
-		_systemId = systemId;
-		_grammar = new GrammarAccess( systemId );
-		System.out.println( "Created Xerces DTDDocumentImpl: " 
-		+ getExternalID() );
-	}
-	
-	public GrammarAccess getGrammarAccess()
-	{
-		return _grammar;
-	}
-	
-	public String getName() 
-	{
-		// REVISIT
-		String tempName = "No_name_yet_" + System.currentTimeMillis();
-		return tempName;
-	}
-	
-	public Enumeration getElements() 
-	{
-		if (!_initialized && _elements == null && _grammar != null) 
-		{
-			String[] elements = _grammar.getElements();
-            if (elements==null)
+
+    /**
+     * @deprecated Use GrammarDocument.
+     */
+    public DTDDocumentImpl(String publicId, String systemId) {
+        _publicId = publicId;
+        _systemId = systemId;
+        System.err.println(
+            "Created Xerces DTDDocumentImpl: " + getExternalID());
+    }
+
+    /**
+     * @deprecated Use GrammarDocument.
+     */
+    public String getName() {
+        // REVISIT
+        String tempName = "No_name_yet_" + System.currentTimeMillis();
+        return tempName;
+    }
+
+    /**
+     * @deprecated Use GrammarDocument.
+     */
+    public Enumeration getElements() {
+        if (!_initialized && _elements == null && _grammarDocument != null) {
+            _initialized = true;
+            _elements = new Hashtable();
+            GrammarComplexType[] elements =
+                _grammarDocument.getTopLevelGrammarComplexTypes();
+            for (int i = 0; i < elements.length; i++) {
+                GrammarComplexType element = elements[i];
+                String elementName = element.getName();
+                DTDElement el =
+                    new DTDElementImpl(this, (GrammarComplexType) element);
+                _elements.put(elementName, el);
+                _complexTypes.put(elementName, element);
+            }
+        }
+        if (_elements != null)
+            return _elements.elements();
+        else if (_grammarDocument == null) {
+            // This is used when creating a new file from a schema...
+            //Lets try to get it for a Schema
+            //FIXME We can't tell if its a Schems or a DTD at this point
+            //Really should have separate classes and an interface
+            // Get the DTDEntry from the cache
+            DTDCache cache = DTDCache.getSharedInstance();
+            DTDCacheEntry ce =
+                cache.findDTDbySystemId(_publicId, _systemId, _pluginId);
+            String s = new String(ce.getCachedDTDStream());
+            StringReader reader = new StringReader(s);
+            DOMImplementationAS domImpl =
+                (DOMImplementationAS) ASDOMImplementationImpl
+                    .getDOMImplementation();
+            // create a new parser, and set the error handler
+            DOMASBuilder parser = domImpl.createDOMASBuilder();
+            ASModel as;
+            Vector v = null;
+            try {
+                //as = parser.parseASInputSource(new SchemaInputSource(reader));
+                as = parser.parseASInputSource(new DOMInputImpl(null, null, null, reader, null));
+                XSModel xsmodel = getSchemaGrammars(as);
+                XSNamedMap namedmap =
+                    xsmodel.getComponents(XSConstants.ELEMENT_DECLARATION);
+                v = new Vector(namedmap.getLength());
+                for (int i = 0; i < namedmap.getLength(); i++) {
+                    XSElementDeclaration elementDecl =
+                        (XSElementDeclaration) namedmap.item(i);
+                    String name = elementDecl.getName();
+                    v.add(name);
+                    System.err.println("Element found " + name);
+                }
+                return v.elements();
+            } catch (Exception ex) {
+                System.err.println("ERROR: Exception...");
+                ex.printStackTrace();
                 return null;
+            }
 
-			_initialized = true;
-			_elements = new Hashtable();
-			for ( int i = 0; i < elements.length; i++ )
-			{
-				String elementName = elements[i];
-				DTDElement el = new DTDElementImpl( this, elementName );
-				_elements.put( elementName, el );
-			}
-		}
-		if (_elements != null) {
-			return _elements.elements();
-		}
-		else {
-			return null;
-		}
-	}
-	
-	public DTDElement fetchElement(String name) 
-	{
-		if (_elements != null) {
-			DTDElement el = (DTDElement)_elements.get(name);
-			return el;
-		}
-		return null;
-	}
+        }
+        return null;
+    }
 
-	/*
-	public int getNodeType( String nodeName )
-	{
-		DTDElement element = fetchElement( nodeName );
-		int ret = -2;
-		if ( element != null )
-			ret = element.getNodeType();
-		return ret;
-	}
-	*/
-	
-	public Enumeration getInsertableElements(Element el, int index) 
-	{
-		String elementName = el.getNodeName();
-		String[] currentChildElements = getChildNodeNamesWithoutText( el );
-		// Recalculate the index as if the #text nodes never existed.
-		index = getIndexWithoutTextNodes( el, index );
-		//System.out.println( "Getting insertable elements for " + elementName 
-		//+ " at position " + index );
-		String[] results = _grammar.whatCanGoHere( elementName,
-		currentChildElements, index );
-		List list = new Vector();
-		for ( int i = 0; i < results.length; i++ )
-		{
-			String result = results[i];
-			if ( result.equals( "#text" ) )
-				result = DTDConstants.PCDATA_KEY;
-			//System.out.println( " Can insert: " + result );
-			DTDElement element = (DTDElement)_elements.get( result );
-			if ( element == null )
-				element = new DTDElementImpl( this, result );
-			list.add( element );
-		}
-		Enumeration ret = Collections.enumeration( list );
-		return ret;
-	}
+    private XSModel getSchemaGrammars(ASModel as) {
+        ASModelImpl model = (ASModelImpl) as;
+        Vector models = model.getInternalASModels();
+        SchemaGrammar[] grammars = new SchemaGrammar[models.size()];
+        for (int i = 0; i < models.size(); i++)
+            grammars[i] = ((ASModelImpl) models.elementAt(i)).getGrammar();
+        return new XSModelImpl(grammars);
+    }
 
-	public Enumeration getInsertableElements( Element el ) 
-	{
-		String elementName = el.getNodeName();
-		String[] currentChildElements = getChildNodeNames( el );
-		// Use a list temporarily to maintain the sequence
-		List list = new Vector();
-		for ( int i = 0; i <= currentChildElements.length; i++ )
-		{
-			Enumeration insertables = getInsertableElements( el, i );
-			while ( insertables.hasMoreElements() )
-				list.add( insertables.nextElement() );
-		}
-		// Remove duplicates while maintaining sequence
-		Comparator c = new ListComparator( list );
-		TreeSet noDuplicates = new TreeSet( c );
-		noDuplicates.addAll( list );
-		Enumeration ret = Collections.enumeration( noDuplicates );
-		return ret;
-	}
-	
-	public int getInsertPosition( Element parent, String childElementName )
-	{
-		String parentName = parent.getNodeName();
-		//System.out.println( "Getting insert position for parent " + parentName
-		//+ " and child " + childElementName );
-		String[] currentChildElements = getChildNodeNames( parent );
-		int insertPosition = -1;
-		// All the available insert positions
-		outer: for ( int i = 0; i <= currentChildElements.length; i++ )
-		{
-			if ( i < currentChildElements.length )
-			{
-				String currentChild = currentChildElements[i];
-				//System.out.println( " At current child " + currentChild + " i="
-				//+ i );
-			}
-			Enumeration e = getInsertableElements( parent, i );
-			while ( e.hasMoreElements() )
-			{
-				DTDElement el = (DTDElement)e.nextElement();
-				String name = el.getName();
-				//System.out.println( "  Checking insertable " + name );
-				if ( name.equals( childElementName ) )
-				{
-					insertPosition = i;
-					//System.out.println( "  Returning position " + insertPosition );
-				}
-			}
-		}
-		// REVISIT: Throw an exception
-		if ( insertPosition == -1 )
-			insertPosition = currentChildElements.length;
-		//System.out.println( "  Returning position " + insertPosition );
-		return insertPosition;
-	}
-	
-	public int getIndexWithoutTextNodes( Element el, int index )
-	{
-		int countWithoutText = 0;
-		if ( index < 0 )
-			index = 0;
-		NodeList children = el.getChildNodes();
-		for ( int i = 0; i <= index; i++ )
-		{
-			if ( i >= index )
-			{
-				//System.out.println( "Returning countWithoutText=" 
-				//+ countWithoutText );
-				return countWithoutText;
-			}
-			if ( i < children.getLength() )
-			{
-				Node child = (Node)children.item( i );
-				String childName = child.getNodeName();
-				//System.out.println( "getIndexWithoutTextNodes: childName: " 
-				//+ childName );
-                if ( childName != null 
-                    && !childName.equals("#text") 
-                    && !childName.equals("#comment") 
-                    && !(child instanceof ProcessingInstruction))
-				{
-					countWithoutText++;
-				}
-			}
-		}
-		//System.out.println( "Returning countWithoutText=0" );
-		return 0;
-	}
-	
-	public String[] getChildNodeNames( Element el )
-	{
-		Vector v = new Vector();
-		NodeList children = el.getChildNodes();
-		for ( int i = 0; i < children.getLength(); i++ )
-		{
-			Node child = (Node)children.item( i );
-			String childName = child.getNodeName();
-			if ( childName != null )
-			{
-				v.add( childName );
-				//System.out.println( "Adding child node: " + childName );
-			}
-		}
-		String[] childNames = new String[0];
-		childNames = (String[])v.toArray( childNames );
-		return childNames;
-	}
-	
-	public String[] getChildNodeNamesWithoutText( Element el )
-	{
-		Vector v = new Vector();
-		NodeList children = el.getChildNodes();
-		for ( int i = 0; i < children.getLength(); i++ )
-		{
-			Node child = (Node)children.item( i );
-			String childName = child.getNodeName();
-			// REVISIT: Not sure if it is right to exclude #text like this, but
-			// it seems to work
-			if ( childName != null 
-                && !childName.equals( "#text" ) 
-                && !childName.equals("#comment")
-				&& !(child instanceof ProcessingInstruction))
-			{
-				v.add( childName );
-				//System.out.println( "Adding child node: " + childName );
-			}
-		}
-		String[] childNames = new String[0];
-		childNames = (String[])v.toArray( childNames );
-		return childNames;
-	}
-	
-    public boolean elementIsValid (Element el, boolean checkChildren)
-    {
-		boolean ret = false;
-		String elementName = el.getNodeName();
-		String[] childNodeNames = getChildNodeNamesWithoutText( el );
-		ret = _grammar.validateContent( elementName, childNodeNames );
-		if ( ret == false )
-			System.out.println( "Element " + elementName + " is not valid." );
-		if ( ret == true && checkChildren )
-		{
-			NodeList list = el.getChildNodes();
-			for ( int i = 0; i < list.getLength(); i++ )
-			{
-				Node child = list.item( i );
-				if ( child instanceof Element )
-				{
-					Element childElement = (Element)child;
-					ret = elementIsValid( childElement, true );
-					if ( ret == false )
-						break;
-				}
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 * Returns the external identifier or null if there is none.
-	 * <P>
-	 * The string should include PUBLIC and SYSTEM identifiers if they
-	 * are available.
-	 */
-	public String getExternalID() 
-	{
-		StringBuffer sb = new StringBuffer();
-		boolean added_public = false;
-		
-		if (_publicId != null && !_publicId.equals("")) {
-			sb.append("PUBLIC \""+_publicId+"\"");
-			added_public = true;
-		}
-		if (_systemId == null) {
-		    _systemId = "";
-		}
-		
-		if (!added_public) {
-		    sb.append("SYSTEM");
-		}
-		sb.append(" \""+_systemId+"\"");
-	
-		if (sb.length() > 0) {
-			return sb.toString();
-		}
-		
-		/*
-		ExternalID id = _doc.getExternalID();
-		if (id != null) {
-			return id.toString();
-		}
-		*/
-		return null;
-					
-	}
-	
-	public class ListComparator implements Comparator
-	{
-		public List list;
-		
-		public ListComparator( List list )
-		{
-			this.list = list;
-		}
-		
-		public int compare( Object o1, Object o2 )
-		throws ClassCastException
-		{
-			int rank1 = list.indexOf( o1 );
-			int rank2 = list.indexOf( o2 );
-			if ( rank1 == -1 || rank2 == -1 )
-				return 0;
-			int ret = rank1 - rank2;
-			return ret;
-		}
-		
-		public boolean equals( Object obj )
-		{
-			boolean ret = false;
-			if ( obj instanceof ListComparator )
-			{
-				ListComparator lc = (ListComparator)obj;
-				if ( lc.list == this.list )
-					ret = true;
-			}
-			return ret;
-		}
-	}
+    /**
+     * @deprecated Use GrammarDocument.
+     */
+    public DTDElement fetchElement(String name) {
+        if (_elements != null) {
+            DTDElement el = (DTDElement) _elements.get(name);
+            return el;
+        }
+        return null;
+    }
+
+    /**
+     * @deprecated Use GrammarComplexType.
+     */
+    public Enumeration getInsertableElements(Element el, int index) {
+        String elementName = el.getNodeName();
+        GrammarComplexType complexType = getComplexType(el);
+        GrammarComplexType[] insertables =
+            complexType.getInsertableElements(el, index);
+        List list = new Vector();
+        for (int i = 0; i < insertables.length; i++) {
+            complexType = insertables[i];
+            if (complexType != null) {
+                String name = complexType.getName();
+                DTDElement element = (DTDElement) _elements.get(name);
+                list.add(element);
+            }
+        }
+        Enumeration ret = Collections.enumeration(list);
+        return ret;
+    }
+
+    /**
+     * @deprecated Use GrammarComplexType.
+     */
+    private GrammarComplexType getComplexType(Node node) {
+        GrammarComplexType ret = null;
+        if (node == null)
+            return null;
+        if (!(node instanceof Element))
+            return null;
+        Element el = (Element) node;
+        Node parent = node.getParentNode();
+        GrammarComplexType parentComplexType = getComplexType(parent);
+        if (parentComplexType != null)
+            ret = parentComplexType.getChild(node.getNodeName());
+        else
+            ret = (GrammarComplexType) _complexTypes.get(node.getNodeName());
+        return ret;
+    }
+
+    /**
+     * @deprecated Use GrammarComplexType.
+     */
+    public Enumeration getInsertableElements(Element el) {
+        String elementName = el.getNodeName();
+        GrammarComplexType complexType = getComplexType(el);
+        GrammarComplexType[] insertables =
+            complexType.getInsertableElements(el);
+        List list = new Vector();
+        for (int i = 0; i < insertables.length; i++) {
+            complexType = insertables[i];
+            if (complexType != null) {
+                String name = complexType.getName();
+                DTDElement element = (DTDElement) _elements.get(name);
+                list.add(element);
+            }
+        }
+        Enumeration ret = Collections.enumeration(list);
+        return ret;
+    }
+
+    /**
+     * @deprecated Use GrammarComplexType.
+     */
+    public int getInsertPosition(Element parent, String childElementName) {
+        String elementName = parent.getNodeName();
+        GrammarComplexType complexType = getComplexType(parent);
+        int ret = complexType.getInsertPosition(parent, childElementName);
+        return ret;
+    }
+
+    /**
+     * @deprecated Use GrammarComplexType.
+     */
+    public boolean elementIsValid(Element el, boolean checkChildren) {
+        String elementName = el.getNodeName();
+        GrammarComplexType complexType = getComplexType(el);
+        boolean ret =
+            complexType.getIsLocationValid(el)
+                && complexType.getIsSimpleContentValid(el)
+                && complexType.getIsEachAttributeValid(el);
+        if (ret == true && checkChildren) {
+            NodeList list = el.getChildNodes();
+            for (int i = 0; i < list.getLength(); i++) {
+                Node child = list.item(i);
+                if (child instanceof Element) {
+                    ret = elementIsValid((Element) child, checkChildren);
+                    // JML - this method is now recursive
+                    if (!ret) {
+                        break;
+                    }
+                    /*
+                    elementName = el.getNodeName();
+                    complexType = getComplexType(child);
+                    Element childElement = (Element)child;
+                    ret = complexType.getIsLocationValid(childElement) &&
+                     complexType.getIsSimpleContentValid(childElement) &&
+                     complexType.getIsEachAttributeValid(childElement);
+                    if ( ret == false )
+                    	break;
+                    */
+                }
+            }
+        }
+
+        // Finally check for overall validity - JML
+        if (ret) {
+            int result = complexType.validate(el);
+            return (result == -1);
+        }
+        return ret;
+    }
+
+    /**
+     * Returns the external identifier or null if there is none.
+     * <P>
+     * The string should include PUBLIC and SYSTEM identifiers if they
+     * are available.
+     */
+    public String getExternalID() {
+        StringBuffer sb = new StringBuffer();
+        boolean added_public = false;
+
+        if (_publicId != null && !_publicId.equals("")) {
+            sb.append("PUBLIC \"" + _publicId + "\"");
+            added_public = true;
+        }
+        if (_systemId == null) {
+            _systemId = "";
+        }
+
+        if (!added_public) {
+            sb.append("SYSTEM");
+        }
+        sb.append(" \"" + _systemId + "\"");
+
+        if (sb.length() > 0) {
+            return sb.toString();
+        }
+
+        /*
+        ExternalID id = _doc.getExternalID();
+        if (id != null) {
+        	return id.toString();
+        }
+        */
+        return null;
+
+    }
+
+    /**
+     * Temporary method.
+     * @deprecated Use GrammarComplexType.
+     */
+    public void setGrammarDocument(GrammarDocument grammarDocument) {
+        _grammarDocument = grammarDocument;
+    }
+
+    /*
+    private class SchemaInputSource
+        extends InputSource
+        implements DOMInputSource {
+        public SchemaInputSource(Reader r) {
+            super(r);
+        }
+
+        public String getStringData() {
+            return null;
+        }
+
+        public void setStringData(String s) {}
+
+        public String getBaseURI() {
+            return null;
+        }
+
+        public void setBaseURI(String s) {}
+    }
+    */
 }
-
-

@@ -2,8 +2,8 @@ Welcome to the Xerlin XML editor version @version@.
 
 Xerlin is an opensource XML modeling application 
 written for the Java 2 platform (JDK1.2.2 or JDK1.3). 
-Xerlin is being released by ChannelPoint, Inc. as an
-opensource project. It is being written by a team
+Xerlin is being released by SpeedLegal Holdings, Inc.
+as an opensource project. It is being written by a team
 of engineers interested in seeing a nice user interface
 for working with XML files.
 
@@ -101,7 +101,7 @@ OTHER NOTES
 
 Xerlin includes software provided by IBM, Apache, and other
 third party sources. These are distributed under the licenses included. 
-ChannelPoint and these third parties do not provide any 
+SpeedLegal and these third parties do not provide any 
 warranties regarding this software. See the LICENSE file for more legal
 information.
 

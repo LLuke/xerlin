@@ -55,21 +55,9 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.event.*;
-import java.awt.datatransfer.*;
-import java.beans.*;
-
-import java.io.*;
-import javax.swing.*;
-import javax.swing.undo.*;
-import javax.swing.event.*;
-import java.text.*;
-
-import java.util.*;
-
-import com.sun.javax.swing.*;
-
-import org.w3c.dom.*;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoableEdit;
 
 public class MerlotUndoableEdit 
     implements UndoableEdit, MerlotConstants

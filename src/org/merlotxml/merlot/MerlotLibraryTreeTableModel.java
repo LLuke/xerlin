@@ -55,24 +55,17 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.*;
+import java.util.Vector;
 
-import java.io.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import javax.swing.tree.*;
-import java.awt.datatransfer.*;
-import java.util.*;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
-import com.sun.javax.swing.*;
-
-import java.awt.Rectangle;
-
-import matthew.awt.*;
-
-
-import org.w3c.dom.*;
+import matthew.awt.StrutLayout;
 
 /**
  * 
@@ -82,8 +75,6 @@ import org.w3c.dom.*;
  * 
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: MerlotLibraryTreeTableModel.java,v 1.4 2002/09/12 00:28:17 justin Exp $
  *
  */
 public class MerlotLibraryTreeTableModel  extends DOMTreeTableAdapter
@@ -110,16 +101,12 @@ public class MerlotLibraryTreeTableModel  extends DOMTreeTableAdapter
 		_library = lib;
 
 		MerlotDOMDocument doc = _root.getMerlotDOMDocument();
-		doc.addMerlotNodeListener(this);
-
 
 		_later = new AddNodeLaterRunnable();
 		_laterThread = new Thread(_later);
 		_laterThread.start();
 		
 	}
-
-
 
 	/**
 	 * 
@@ -214,8 +201,8 @@ public class MerlotLibraryTreeTableModel  extends DOMTreeTableAdapter
 	 * This adds a new item to the library where the user dropped it, or pasted it
 	 * It asks the user what they want to name the item first.
 	 */
-	protected void newLibItem(int row, MerlotDOMFragment frag, 
-                                int where, boolean paste) {
+	protected void newLibItem(int row, MerlotDOMFragment frag, int where, boolean paste) 
+	{
 		MerlotDOMNode item = null;
 
 
@@ -288,27 +275,32 @@ public class MerlotLibraryTreeTableModel  extends DOMTreeTableAdapter
 				if (nodeName == null || nodeName.equals("")) {
 					nodeName = nd.getNodeName();
 				}
-
-                // Item should belong to doppedon MerlotDOMDocument...
-                Node itemnd = droppedon.getRealNode().getOwnerDocument().
-                                                createElement("libitem");
-                item = new MerlotDOMElement((Element)itemnd, 
-                                                droppedon.getXMLFile());
-				//item = frag.newChild("libitem");
+				item = frag.newChild("libitem");
 				((MerlotDOMElement)item).setAttribute("name",nodeName);
 				if (nd != null) {
+					
+					
 					// now we need to put together the fragment for passing to importFragment
+		
 					
 					for (int i=0;i<nodes.length;i++) {
 						frag.removeChild(nodes[i]);
-						item.importChild(nodes[i]);
+						item.appendChild(nodes[i]);
 					}
-                    frag.importChild(item);
 					MerlotDebug.msg("importing fragment "+frag+" to library");
 					frag.printNode();
+					
+					
 					importFragment(row, frag, where, paste,false);
+					//	_table.getTree().treeDidChange();
+					
+					
 				}
+				
+				
 			}
+		
+		
 		}
 	}
 	
@@ -440,14 +432,7 @@ public class MerlotLibraryTreeTableModel  extends DOMTreeTableAdapter
 			return null;
 		}
 		else {
-			return super.filterChildNodes(nd);
+            return super.filterChildNodes(nd);
 		}
-		
-		
 	}
-	
-
-	
-
-	
 }

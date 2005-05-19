@@ -3,10 +3,12 @@
 
 package org.merlotxml.util;
 
-import java.util.*;
-import java.io.*;
-import java.text.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 
@@ -15,7 +17,6 @@ import java.net.*;
  *
  * @author Kelly A.Campbell
  *
- * @version $Id: ManifestMaker.java,v 1.2 2002/09/15 05:50:20 justin Exp $
  */
 
 public class ManifestMaker 
@@ -23,10 +24,10 @@ public class ManifestMaker
 
     public static String MANIFEST_DEF_SPEC_TITLE = "";
     public static String MANIFEST_DEF_SPEC_VERS  = "";
-    public static String MANIFEST_DEF_SPEC_VEND  = "SpeedLegal Holdings Inc.";
+    public static String MANIFEST_DEF_SPEC_VEND  = "ChannelPoint, Inc.";
     public static String MANIFEST_DEF_IMPL_TITLE = "";
     public static String MANIFEST_DEF_IMPL_VERS  = "";
-    public static String MANIFEST_DEF_IMPL_VEND  = "SpeedLegal Holdings Inc.";
+    public static String MANIFEST_DEF_IMPL_VEND  = "ChannelPoint, Inc.";
     
 
     public static final String MANIFEST_VERSION = "Manifest-Version: ";

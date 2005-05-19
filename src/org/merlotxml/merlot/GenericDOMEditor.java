@@ -52,23 +52,21 @@ http://www.merlotxml.org
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.event.*;
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
+import java.text.MessageFormat;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import java.util.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.io.*;
-import org.w3c.dom.*;
-import java.text.*;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import matthew.awt.StrutLayout;
-import org.merlotxml.util.xml.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.GrammarComplexType;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.Node;
 
 /**
  * Editor of nodes and such
@@ -238,6 +236,10 @@ public class GenericDOMEditor implements MerlotDOMEditor, MerlotConstants
 	{
 		return false;
 	}
+    
+    public boolean suppressAddType(GrammarComplexType el) {
+        return false;
+    }
 	
 	public void installListener(JPanel p, MerlotDOMNode node) 
 	{

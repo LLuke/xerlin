@@ -59,7 +59,6 @@ import org.merlotxml.util.WrapperException;
  * Wraps exceptions that are thrown by plugin configurations.
  * 
  * @author Tim McCune
- * @version $Id: PluginConfigException.java,v 1.2 2001/09/27 16:13:33 camk Exp $
  */
 
 public class PluginConfigException extends WrapperException {

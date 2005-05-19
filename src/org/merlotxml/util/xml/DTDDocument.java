@@ -55,8 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
 
 import org.w3c.dom.Element;
 
@@ -69,7 +68,7 @@ import org.w3c.dom.Element;
  * 
  *
  * @author Kelly A. Campbell
- * @version $Id: DTDDocument.java,v 1.7 2001/08/14 15:47:27 camk Exp $
+ * @deprecated Use GrammarDocument.
  */
 
 public interface DTDDocument
@@ -85,9 +84,13 @@ public interface DTDDocument
 	/**
 	 * Returns the list of declared elements from the document.
 	 * @return Enumeration consisting of DTDElement objects or null
+     * @deprecated Use GrammarDocument.
 	 */
 	public Enumeration getElements();
 	
+	/**
+     * @deprecated Use GrammarDocument.
+	 */
 	public DTDElement fetchElement( String name );
 	
 	/**
@@ -107,16 +110,24 @@ public interface DTDDocument
 	 * @param index index where the returned elements should be insertable
 	 * 
 	 * @return Enumeration of the insertable DTDElements objects
+     * @deprecated Use GrammarComplexType
 	 */
 	public Enumeration getInsertableElements(Element el, int index);
 		
+	/**
+     * @deprecated Use GrammarComplexType
+	 */
 	public Enumeration getInsertableElements( Element el );
 	
+	/**
+     * @deprecated Use GrammarComplexType
+	 */
 	public int getInsertPosition( Element parent, String childElementName );
 	
 	/**
 	 * Returns whether or not an element (with or without its children)
 	 * is valid according to its DTD definition.
+     * @deprecated Use GrammarComplexType
 	 */
 	public boolean elementIsValid (Element el, boolean checkChildren);
 	
@@ -124,5 +135,9 @@ public interface DTDDocument
 	 * Returns the SYSTEM identifier for a dtd
 	 */
 	public String getExternalID();
-	
+
+    /**
+     * Allows setting of the GrammarDocument
+     */
+    public void setGrammarDocument(GrammarDocument gdoc);
 }

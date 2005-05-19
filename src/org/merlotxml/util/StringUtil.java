@@ -59,7 +59,6 @@ package org.merlotxml.util;
  * String utilities
  * 
  * @author Tim McCune
- * @version $Id: StringUtil.java,v 1.4 2000/05/02 23:21:54 camk Exp $
  */
 
 public class StringUtil {

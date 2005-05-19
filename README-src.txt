@@ -10,12 +10,6 @@ to build. These jars are also included in the CVS repository. They are not
 included with the source distribution to avoid duplication for people who
 download both the binary and source distributions. 
 
-The jars in the lib directory are:
-StrutLayout1.2.1.jar
-xalan-1.0.jar
-xerces-1.0.3.jar
-
-
 Xerlin is primarily developed on RedHat Linux with the Blackdown
 or Sun JDK and WindowsNT/2000 with Sun's JDK1.2.2. 
 If you run into build problems on other platforms,
@@ -31,13 +25,11 @@ commandline "java org.merlotxml.merlot.XMLEditor"
 The source is organized into a couple of packages:
 
 org.merlotxml.
-              awt:         The PercentLayout LayoutManager
-
-	      merlot:	   The main xerlin source
-		    plugin: Plugin support classes
-
-	      util:	   Utility classes used by xerlin, 
-			   including the xml parser adapters
+    awt:     The PercentLayout LayoutManager
+    merlot:  The main xerlin source
+    plugin:  Plugin support classes
+    util:    Utility classes used by xerlin, 
+             including the xml parser adapters
 
 The "lib" directory contains some third-party sources required
 by Xerlin, along with some patches for those 

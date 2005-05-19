@@ -55,17 +55,20 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml.xerces;
 
-import java.io.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
-import org.merlotxml.util.xml.*;
+import org.merlotxml.util.xml.DTDAttribute;
+import org.merlotxml.util.xml.DTDContentSpec;
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.GrammarComplexType;
+import org.merlotxml.util.xml.GrammarSimpleType;
 
 
 
 /**
  *
  * @author Evert Hoff
- * @version 
  */
 
 public class DTDElementImpl implements DTDElement, Comparable
@@ -75,6 +78,8 @@ public class DTDElementImpl implements DTDElement, Comparable
 	private String _name = null;
 	
 	private Hashtable _attrs = null;
+    private Hashtable _attributeSimpleTypes = new Hashtable();
+    private GrammarComplexType _complexType;
 	
 	// Not set yet.
 	private int _type = -2;
@@ -84,6 +89,11 @@ public class DTDElementImpl implements DTDElement, Comparable
 		_doc = doc;
 		_name = name;
 	}
+    
+    public DTDElementImpl(DTDDocumentImpl doc, GrammarComplexType complexType) {
+        _complexType = complexType;
+        _doc = doc;
+    }
 	
 	public DTDDocumentImpl getDTDDocumentImpl()
 	{
@@ -92,7 +102,7 @@ public class DTDElementImpl implements DTDElement, Comparable
 	
 	public String getName() 
 	{
-		return _name;
+		return _complexType.getName();
 	}
 	
 	/*
@@ -109,25 +119,18 @@ public class DTDElementImpl implements DTDElement, Comparable
 	
 	public Enumeration getAttributes() 
 	{
-		if ( _attrs == null )
-		{
-			_attrs = new Hashtable();
-			GrammarAccess grammar = _doc.getGrammarAccess();
-			String[] attributes = grammar.getAttributeNames( _name );
-			for ( int i = 0; i < attributes.length; i++ )
-			{
-				String attributeName = attributes[i];
-				DTDAttribute dtdAttr = new DTDAttributeImpl( this, attributeName );
-				_attrs.put( attributeName, dtdAttr );
-			}
-		}
-		// REVISIT: I don't want to change the interface, but I think it is
-		// better to return an empty Enumeration than null. - Evert
-		if (_attrs.size() == 0) {
-			return null;
-		}
-		
-		return _attrs.elements();
+        if (_attrs == null) {
+            _attrs = new Hashtable();
+            GrammarSimpleType[] attributeSimpleTypes = 
+             _complexType.getAttributes();
+            for (int i = 0; i < attributeSimpleTypes.length; i++) {
+                GrammarSimpleType attributeSimpleType = attributeSimpleTypes[i];
+                String name = attributeSimpleType.getName();
+                _attrs.put(name, new DTDAttributeImpl((GrammarSimpleType)attributeSimpleType));
+                _attributeSimpleTypes.put(name, attributeSimpleType);
+            }
+        }
+        return _attrs.elements();
 	}
 	
 	public DTDAttribute getAttribute(String name) 

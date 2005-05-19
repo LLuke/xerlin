@@ -55,19 +55,37 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Iterator;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import javax.swing.table.*;
-import org.w3c.dom.*;
+import javax.swing.tree.TreePath;
 
-import com.sun.javax.swing.*;
+import com.sun.javax.swing.JTreeTable;
+import com.sun.javax.swing.TreeTableModel;
 
 
 /**
@@ -75,8 +93,6 @@ import com.sun.javax.swing.*;
  * JTreeTable which implements drag and drop operations
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: DNDJTreeTable.java,v 1.4 2002/09/12 00:24:49 justin Exp $
  *
  */
 public class DNDJTreeTable extends JTreeTable implements DragGestureListener, DropTargetListener
@@ -164,14 +180,10 @@ public class DNDJTreeTable extends JTreeTable implements DragGestureListener, Dr
 		}
 	    }
 	    if (selection instanceof Transferable) {
-            try {
-		        _dragSource.startDrag(dragGestureEvent,
+		_dragSource.startDrag(dragGestureEvent,
 				      DragSource.DefaultCopyDrop,
 				      (Transferable)selection,
 				      _dragSourceListener);
-            } catch (InvalidDnDOperationException ex) {
-                //Can be thrown when switching frames
-            }
 	    }
 			
 	}

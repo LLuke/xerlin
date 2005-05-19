@@ -53,24 +53,33 @@ http://www.merlotxml.org/.
 package org.merlotxml.merlot.plugin;
 
 import java.awt.event.ActionEvent;
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
-import java.util.*;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.merlotxml.merlot.*;
-import org.merlotxml.util.xml.*;
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import org.w3c.dom.*;
-
+import org.merlotxml.merlot.MerlotConstants;
+import org.merlotxml.merlot.MerlotDebug;
+import org.merlotxml.merlot.MerlotOptionPane;
+import org.merlotxml.merlot.MerlotResource;
+import org.merlotxml.merlot.MerlotUtils;
+import org.merlotxml.merlot.XMLEditorFrame;
+import org.merlotxml.merlot.XMLEditorSettings;
+import org.merlotxml.util.xml.XPathUtil;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
  * Merlot Plugin Configuration
  * 
  * @author Tim McCune
- * @version	$Id: PluginConfig.java,v 1.6 2001/09/27 16:13:33 camk Exp $
  */
 
 public abstract class PluginConfig {

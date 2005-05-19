@@ -52,22 +52,21 @@ http://www.channelpoint.com/merlot.
 
 
 // Copyright 1997-1998 ChannelPoint, Inc. All Rights Reserved.
-// $Id: FileUtil.java,v 1.3 2000/03/10 05:31:17 camk Exp $
+// $Id: FileUtil.java,v 1.3.8.2 2005/03/12 08:19:43 everth Exp $
 
 package org.merlotxml.util;
 
-import java.util.*;
-import java.net.*;
-import java.io.*;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipEntry;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * File utilities
  *
  * @author	Rick Boykin
- * @version $Id: FileUtil.java,v 1.3 2000/03/10 05:31:17 camk Exp $
  */
 
 public class FileUtil {

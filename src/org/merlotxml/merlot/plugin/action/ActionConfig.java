@@ -52,20 +52,16 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.action;
 
-import java.util.*;
-import javax.swing.*;
+import javax.swing.JMenuItem;
 
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
-
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
  * Merlot Pluggable Action Configuration
  * 
  * @author Tim McCune
- * @version $Id: ActionConfig.java,v 1.4 2001/01/30 04:50:42 camk Exp $
  */
 public class ActionConfig {
 	

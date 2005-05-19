@@ -55,12 +55,15 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.awt.*;
-import java.util.*;
+import java.beans.PropertyVetoException;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import java.beans.*;
-import javax.swing.*;
-import org.merlotxml.util.xml.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+
+import org.merlotxml.util.xml.DTDElement;
+import org.merlotxml.util.xml.GrammarComplexType;
 
 
 /**
@@ -181,6 +184,10 @@ public class NullEditor implements MerlotDOMEditor
 		return true;
 	}
 	
+	public boolean suppressAddType(GrammarComplexType el)
+	{
+		return true;
+	}
 	
 
 

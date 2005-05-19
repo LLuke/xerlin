@@ -55,9 +55,11 @@ http://www.channelpoint.com/merlot.
 
     package org.merlotxml.merlot;
 
-import java.awt.*;
+import java.awt.Component;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 
 
 /**
@@ -66,8 +68,6 @@ import javax.swing.*;
  * parent frame grab focus after the option pane goes away.
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: MerlotOptionPane.java,v 1.4 2001/03/27 01:09:43 justin Exp $
  *
  */
 public class MerlotOptionPane

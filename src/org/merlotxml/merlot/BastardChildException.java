@@ -54,7 +54,7 @@ http://www.channelpoint.com/merlot.
 // Copyright 1999 ChannelPoint, Inc., All Rights Reserved.
 
 package org.merlotxml.merlot;
-import org.w3c.dom.*;
+import org.w3c.dom.DOMException;
 
 /**
  *

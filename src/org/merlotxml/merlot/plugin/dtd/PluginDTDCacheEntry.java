@@ -52,13 +52,12 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.dtd;
 
-import org.merlotxml.util.xml.*;
+import org.merlotxml.util.xml.DTDCacheEntry;
 
 /**
  * Plugin DTD Cache Entry
  * 
  * @author Tim McCune
- * @version $Id: PluginDTDCacheEntry.java,v 1.2 2000/05/24 03:55:49 camk Exp $
  */
 
 public class PluginDTDCacheEntry extends DTDCacheEntry {

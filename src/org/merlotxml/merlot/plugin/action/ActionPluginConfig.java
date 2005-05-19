@@ -52,13 +52,17 @@ http://www.merlotxml.org/.
 
 package org.merlotxml.merlot.plugin.action;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.merlotxml.merlot.plugin.*;
+import org.merlotxml.merlot.plugin.PluginConfig;
+import org.merlotxml.merlot.plugin.PluginConfigException;
+import org.merlotxml.merlot.plugin.PluginManager;
 import org.merlotxml.util.xml.XPathUtil;
-
-import org.w3c.dom.*;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Merlot Action Plugin Configuration		<p>
@@ -67,7 +71,6 @@ import org.w3c.dom.*;
  * multiple action configs.
  * 
  * @author Tim McCune
- * @version	$Id: ActionPluginConfig.java,v 1.4 2001/09/27 16:13:34 camk Exp $
  */
 
 public class ActionPluginConfig extends PluginConfig {

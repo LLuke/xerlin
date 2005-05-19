@@ -38,11 +38,14 @@
 
 package org.merlotxml.merlot;
 
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.SwingUtilities;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.util.Vector;
+
+import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 // SubClass JMenu to provide the same "more" functionality as Sizeable
 // JPopupMenu 
@@ -121,7 +124,7 @@ public class JMoreMenu extends JMenu {
 	
 	// Forcibly insert the item into the menu
 	JMenuItem tempMenuItem = super.add(a);
-	super.remove(tempMenuItem);
+	//super.remove(tempMenuItem);
 	
 	// Determine if we can insert this into the primary menu
 	// or if we must insert into the more menu.
@@ -130,10 +133,11 @@ public class JMoreMenu extends JMenu {
 	double menuItemHeight = tempMenuItem.getPreferredSize().getHeight();
 	
 	if ((preferredHeight + menuItemHeight) < maximumHeight) {
-	    retVal = super.add(a);
+	    retVal = tempMenuItem;
 	}
 	else {
 	    // Create the more menu if necessary
+        super.remove(tempMenuItem);
 	    createSubMoreMenu();
 	    // Add item to the More Menu.
 	    retVal = moreMenu.add(a);

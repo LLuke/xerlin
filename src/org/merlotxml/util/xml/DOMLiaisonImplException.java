@@ -55,7 +55,7 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.util.xml;
 
-import org.merlotxml.util.*;
+import org.merlotxml.util.WrapperException;
 
 /**
  * DOM Liaison Implementation Exception
@@ -63,7 +63,6 @@ import org.merlotxml.util.*;
  * Used to wrap exceptions thrown by implementors of DOMLiaison
  * 
  * @author Tim McCune
- * @version $Id: DOMLiaisonImplException.java,v 1.3 2000/03/10 05:31:17 camk Exp $
  */
 
 public class DOMLiaisonImplException extends WrapperException {

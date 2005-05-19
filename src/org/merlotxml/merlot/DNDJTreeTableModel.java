@@ -55,18 +55,11 @@ http://www.channelpoint.com/merlot.
 
 package org.merlotxml.merlot;
 
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import java.util.*;
+import java.awt.datatransfer.Transferable;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import org.w3c.dom.*;
+import javax.swing.tree.TreePath;
 
-import com.sun.javax.swing.*;
+import com.sun.javax.swing.AbstractTreeTableModel;
 
 
 /**
@@ -74,8 +67,6 @@ import com.sun.javax.swing.*;
  * JTreeTableModel which has some drag and drop operations
  * 
  * @author Kelly A. Campbell
- *
- * @version $Id: DNDJTreeTableModel.java,v 1.2 2000/03/07 04:46:14 camk Exp $
  *
  */
 public abstract class DNDJTreeTableModel extends AbstractTreeTableModel 
@@ -102,6 +93,12 @@ public abstract class DNDJTreeTableModel extends AbstractTreeTableModel
     {
 	return null;
     }
+
+    public void setRoot(Object root) {
+        if (root!=null)
+            this.root= root;
+    }
+
     
 
 }
