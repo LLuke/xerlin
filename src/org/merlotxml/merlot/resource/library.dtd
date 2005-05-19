@@ -1,0 +1,21 @@
+<!--
+Merlot Library DTD
+Kelly A. Campbell
+
+-->
+
+<!-- 
+      Library's main element
+-->
+
+<!ELEMENT library (libshelf*)>
+<!ATTLIST library  name    CDATA    #REQUIRED
+	           bounds  CDATA    #IMPLIED>
+
+<!ELEMENT libshelf (libitem*)>
+<!ATTLIST libshelf name    CDATA    #REQUIRED
+                   expanded (true | false) "true">
+
+<!ELEMENT libitem  ANY>
+<!ATTLIST libitem  name     CDATA   #REQUIRED
+                   dtdsysid CDATA   #IMPLIED>
