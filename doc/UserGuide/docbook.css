@@ -1,0 +1,67 @@
+BODY {
+  margin: 2em 1em 2em 40px;
+  font-family: sans-serif;
+  color: black;
+  background: white;
+  background-position: top left;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  clear: both;
+} 
+
+TH, TD { /* ns 4 */
+  font-family: sans-serif;
+}
+
+H1, H2, H3 {
+  color: #0050B2; 
+}
+
+
+.titlepage {
+  background-position: top right;
+  background-attachment: scroll;
+  background-repeat: no-repeat;
+  background-image: url(images/xerlinh.gif);
+  clear: all
+}
+
+DIV.section { margin-bottom: 1em; margin-top: 1em;  margin-left: 1em; clear: both; }
+H2.title, H3.title { margin-bottom: .25em; margin-top: 1em; }
+DIV.subtitle {margin-left: 2em; color: #0050B2;}
+
+DIV.toc { font-size: 12px ; margin-bottom: 1em; }
+DIV.caption { margin-top: .5em; margin-bottom: .5em; font-family: sans-serif; font-size: 12px; }
+DIV.figure {  margin-top: .5em; margin-left: 1em; }
+DIV.figure-float-left { margin-top: .5em; margin-left: 1em; float: left }
+DIV.figure-float-right { margin-top: .5em; margin-left: 1em; float: right }
+DIV.informalfigure-float-left { float: left }
+DIV.informalfigure-float-right { float: right }
+
+DIV.mediaobject { padding-bottom: .5em; padding-top: .5em; padding-left: .5em; padding-right: .5em; border-style: none; border-color: black; border-width: thin;   }
+IMG.figure { border-style: solid; border-color: black; border-width: thin; }
+IMG.figure-float-left { border-style: solid; border-color: black; border-width: thin; }
+IMG.figure-float-right { border-style: solid; border-color: black; border-width: thin; }
+
+
+DIV.highlights { border-top: thin solid black; border-bottom: thin solid black; padding-bottom: .25em; padding-top: .25em; }
+
+H2.title { border-bottom: thin solid black; }
+
+@media screen {  /* hide from IE3 */
+A:hover { background: #FFA } 
+
+
+PRE { margin-left: 2em }
+DT, DD { margin-top: 0; margin-bottom: 0 } /* opera 3.50 */
+DT { font-weight: bold }
+
+PRE { font-family: monospace }        /* navigator 4 requires this */
+
+@media aural {  
+  H1, H2, H3 { stress: 20; richness: 90 }
+  .hide { speak: none }
+  P.copyright { volume: x-soft; speech-rate: x-fast }
+  DT { pause-before: 20% }
+  PRE { speak-punctuation: code } 
+}

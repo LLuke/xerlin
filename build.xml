@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<!-- ===================================================================
+                     Xerlin Ant build file
+
+See ant docs at http://jakarta.apache.org/ant/
+
+Targets: 
+- all (default) -> builds Xerlin-${version}.jar
+- test -> builds and runs the test cases
+- dist -> creates tar.gz and zip files
+- clean -> restores the project to its original unbuilt state
+- javadoc -> generates the HTML API documentation
+
+-->
+
+<project name="Xerlin" default="all">
+
+  <property name="name.short" value="Xerlin"/>
+  <property name="name.long" value="Xerlin XML Editor"/>
+  <property name="version" value="1.2"/>
+	
+  <property name="jar.name" value="${name.short}-${version}.jar"/>
+
+  <property name="build.dir" value="build"/>
+  <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="xerces" value="xerces-1.4.0.jar"/>
+  <property name="xalan" value="xalan-2.1.0.jar"/>
+  <property name="strutlayout" value="StrutLayout1.2.1.jar"/>
+  <property name="javahelp" value="jh.jar"/>
+  <property name="thirdparty" value="thirdparty.jar"/>
+
+  <property name="classpath" value="lib:lib/${strutlayout}:lib/${xalan}:lib/${xerces}:lib/${javahelp}"/>
+  <property name="classpath.runtime" value="lib/${javahelp} lib/${thirdparty} lib/${strutlayout} lib/${xalan} lib/${xerces}"/>
+  <property name="classpath.runtime.mac" value="${jar.name}:${classpath}"/>
+  <property name="macos.X.dir" value="lib/mac"/>
+
+  <property name="dist.dir" value="dist"/>
+  <property name="dist.bin.name" value="${name.short}-${version}"/>
+  <property name="dist.bin.dir" value="${dist.dir}/${dist.bin.name}"/>
+  <property name="dist.lic.dir" value="${dist.bin.dir}/doc/licenses"/>
+  <property name="dist.src.name" value="${name.short}-${version}-src"/>
+  <property name="dist.src.dir" value="${dist.dir}/${dist.src.name}"/>
+  <property name="dtd.dir" value="dtd"/>
+  <property name="doc.dir" value="doc"/>
+  <property name="exclude" value="org/merlotxml/prototype/*"/>
+  <property name="javadoc.dir" value="${build.dir}/doc/api"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="license.dir" value="doc/licenses"/>
+  <property name="mainClass" value="org.merlotxml.merlot.XMLEditor"/>
+  <property name="manifest" value="${build.dir}/manifest.txt"/>
+  <property name="packages" value="org.merlotxml.*"/>
+  <property name="runargs" value="-d merlot.debug=true"/>
+  <property name="support.dir" value="support"/>
+  <property name="src.dir" value="src"/>
+  <property name="util.dir" value="util"/>
+  <property name="plugins.dist.dir" value="../plugins/dist"/>
+
+<!-- ===========================================================================
+                                Default target
+     =========================================================================== -->
+  <target name="all" depends="jar"/>
+
+<!-- ===========================================================================
+                                Initialization
+     =========================================================================== -->
+  <target name="init">
+    <echo message="-------------------- ${name.short} ${version} build --------------------"/>
+    <echo message=" Using classpath: ${classpath}"/>
+    <echo message=""/>
+    <filter token="version" value="${version}"/>
+    <filter token="name.long" value="${name.long}"/>
+    <filter token="XERLINJAR" value="${jar.name}"/>
+    <filter token="classpath.runtime.mac" value="${classpath.runtime.mac}"/>
+    <available property="plugins.dist.dir.exists" file="${plugins.dist.dir}"/>
+
+  </target>
+
+<!-- ===========================================================================
+                                Compile sources
+     =========================================================================== -->
+  <target name="compile" depends="init">
+    <mkdir dir="${build.classes}"/>
+		
+    <javac srcdir="${src.dir}"
+	destdir="${build.classes}"
+	excludes="${exclude}"
+       	classpath="${classpath}"
+	deprecation="on"
+	optimize="on"
+     />
+
+    <copy todir="${build.classes}" filtering="yes">
+      <fileset dir="${src.dir}"
+	       includes="**/*.properties,**/*.xml,**/*.dtd"
+       />
+    </copy>
+		
+    <copy todir="${build.classes}">
+      <fileset dir="${src.dir}"
+	       includes="**/*.gif, **/*.jpg"
+       />
+    </copy>
+  </target>
+	
+<!-- ===========================================================================
+                                Jar up the classes
+     =========================================================================== -->
+  <target name="jar" depends="compile,thirdparty">
+    <!-- Fork in order to get the local classpath -->
+    <delete file="${manifest}"/>
+    <java classname="org.merlotxml.util.ManifestMaker"
+	  fork="yes" classpath="${classpath}:${build.classes}">
+      <arg line="-st &#x22;${name.long}&#x22;"/>
+      <arg line="-sv &#x22;${version}&#x22;"/>
+      <arg line="-it &#x22;${name.long}&#x22;"/>
+      <arg line="-mc &#x22;${mainClass}&#x22;"/>
+      <arg line="-cp &#x22;${classpath.runtime}&#x22;"/>
+      <arg line="${manifest}"/>
+    </java>
+    <jar jarfile="${name.short}-${version}.jar"
+         basedir="${build.classes}"
+         manifest="${manifest}"
+    />
+  </target>
+	
+  <target name="thirdparty">
+    <jar jarfile="${lib.dir}/${thirdparty}"
+         basedir="${lib.dir}">
+      <exclude name="*.jar"/>
+      <exclude name="src/**"/>
+    </jar>
+  </target>
+	
+<!-- ===========================================================================
+                                javadoc
+     =========================================================================== -->
+  <target name="javadoc" depends="init">
+    <mkdir dir="${javadoc.dir}"/>
+    <javadoc packagenames="${packages}"
+             sourcepath="${src.dir}"
+             destdir="${javadoc.dir}"
+             classpath="${classpath}"
+             author="true"
+             version="true"
+             windowtitle="${name.long} API"
+             doctitle="${name.long}"
+     />
+  </target>
+	
+<!-- ===========================================================================
+                                Create distribution
+     =========================================================================== -->
+  <target name="dist" depends="all, javadoc, bindist, srcdist"/>
+
+  <target name="plugindist" if="plugins.dist.dir.exists">
+    <mkdir dir="${dist.bin.dir}/plugins"/>
+    <copy todir="${dist.bin.dir}/plugins">
+      <fileset dir="${plugins.dist.dir}" includes="*.jar"/>
+    </copy>
+  </target>
+  
+  <target name="bindist" depends="all, plugindist">
+    <mkdir dir="${dist.bin.dir}/${lib.dir}"/>
+    <copy todir="${dist.bin.dir}" filtering="yes">
+      <fileset dir="${basedir}" includes="*.txt" excludes="*src.txt"/>
+    </copy>
+    <copy file="${name.short}-${version}.jar" todir="${dist.bin.dir}"/>
+
+    <copy todir="${dist.bin.dir}/${dtd.dir}">
+      <fileset dir="${dtd.dir}"/>
+    </copy>
+    <copy todir="${dist.bin.dir}/${doc.dir}">
+      <fileset dir="${doc.dir}"/>
+    </copy>
+    <copy todir="${dist.bin.dir}/${doc.dir}">
+      <fileset dir="${build.dir}/${doc.dir}"/>
+    </copy>
+    <copy todir="${dist.bin.dir}/${lib.dir}">
+      <fileset dir="${lib.dir}" includes="*.jar"/>
+    </copy>
+    <copy todir="${dist.bin.dir}"  filtering="yes">
+      <fileset dir="${util.dir}" includes="*.bat,*.sh"/>
+    </copy>
+
+    <!-- Mac OS X app stuff -->
+    <echo message="Copying MacOS X app resources"/>
+    <copy todir="${dist.bin.dir}" filtering="no">
+      <fileset dir="${macos.X.dir}" includes="*.app/**" excludes="**/*.plist, **/*.properties"/>
+    </copy>
+    <copy todir="${dist.bin.dir}" filtering="yes">
+      <fileset dir="${macos.X.dir}" includes="*.app/**/*.plist, *.app/**/*.properties"/>
+    </copy>
+
+    <echo message="Translating end of lines"/>
+    <fixcrlf srcdir="${dist.bin.dir}" cr="add" includes="**/*.txt,**/*.html,*.bat,*.sh,**/*.xml,**/*.dtd,**/*.css"/>
+    <chmod dir="${basedir}" includes="*.sh, **/MacOS/*" perm="ugo+rx"/>
+    <zip zipfile="${dist.bin.dir}.zip"
+         basedir="${dist.dir}" includes="${name.short}-${version}/**"/>
+
+    <fixcrlf srcdir="${dist.bin.dir}" cr="remove" includes="**/*.txt,**/*.html,*.bat,*.sh,**/*.xml,**/*.dtd,**/*.css"/>
+    <tar tarfile="${dist.bin.dir}.tar" basedir="${dist.dir}" excludes="**">
+        <tarfileset dir="${dist.dir}" mode="755">
+                <include name="${dist.bin.name}/**/*.sh"/>
+                <include name="${dist.bin.name}/**/MacOS/*"/>
+        </tarfileset>
+        <tarfileset dir="${dist.dir}">
+                <include name="${dist.bin.name}/**"/>
+                <exclude name="${dist.bin.name}/**/*.sh"/>
+                <exclude name="${dist.bin.name}/**/MacOS/*"/>
+        </tarfileset>
+    </tar>
+    <gzip src="${dist.bin.dir}.tar" zipfile="${dist.bin.dir}.tar.gz"/>
+    <delete file="${dist.bin.dir}.tar"/>
+
+  </target>
+
+<!-- ===========================================================================
+                                Source distribution
+     =========================================================================== -->
+  <target name="srcdist" depends="all">
+    <mkdir dir="${dist.src.dir}/${lib.dir}"/>
+    <copy todir="${dist.src.dir}" filtering="no">
+      <fileset dir="${basedir}">
+        <patternset id="dist.sources">
+          <exclude name="${dist.dir}"/>
+          <exclude name="${build.dir}"/>
+	  <exclude name="plugins"/>
+	  <exclude name="examples"/>
+        </patternset>
+      </fileset>
+    </copy>
+    <fixcrlf srcdir="${dist.src.dir}" cr="add" includes="**/*.txt,**/*.html,*.bat,*.sh,**/*.xml,**/*.dtd,**/*.css,**/*.java"/>
+ 
+    <zip zipfile="${dist.src.dir}.zip"
+         basedir="${dist.dir}" includes="${name.short}-${version}-src/**"/>
+
+    <fixcrlf srcdir="${dist.src.dir}" cr="remove" includes="**/*.txt,**/*.html,*.bat,*.sh,**/*.xml,**/*.dtd,**/*.css,**/*.java"/>
+    <tar tarfile="${dist.src.dir}.tar" basedir="${dist.dir}" excludes="**">
+        <tarfileset dir="${dist.dir}" mode="755">
+                <include name="${dist.src.name}/**/*.sh"/>
+                <include name="${dist.src.name}/**/MacOS/*"/>
+        </tarfileset>
+        <tarfileset dir="${dist.dir}">
+                <include name="${dist.src.name}/**"/>
+                <exclude name="${dist.src.name}/**/*.sh"/>
+                <exclude name="${dist.src.name}/**/MacOS/*"/>
+        </tarfileset>
+    </tar>
+    <gzip src="${dist.src.dir}.tar" zipfile="${dist.src.dir}.tar.gz"/>
+    <delete file="${dist.src.dir}.tar"/>
+
+  </target>
+
+<!-- ===========================================================================
+                                Clean up everything
+     =========================================================================== -->
+  <target name="clean">
+    <delete dir="${build.classes}"/>
+    <delete dir="${dist.dir}"/>
+    <delete dir="${javadoc.dir}"/>
+    <delete file="${name.short}-${version}.jar"/>
+    <delete file="${manifest}"/>
+    <delete file="${lib.dir}/thirdparty.jar"/>
+  </target>
+	
+<!-- ===========================================================================
+                                Test Run
+     =========================================================================== -->
+  <target name="run" depends="jar">
+    <java classname=" "
+          fork="yes">
+      <arg line="${runargs}"/>
+      <jvmarg line="-DDEBUG -jar ${name.short}-${version}.jar"/>
+    </java>
+  </target>
+	
+</project>

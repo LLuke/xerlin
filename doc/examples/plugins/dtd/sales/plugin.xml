@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<dtd-plugin>
+	<name>Sales Plugin</name>
+	<longName>Sales Plugin with ComboBox for IDRef</longName>
+	<version>1.0</version>
+	<author>Evert Hoff</author>
+	<url>http://www.merlotxml.org</url>
+	<dtd>
+		<file>dtd/sales.dtd</file>
+		<doctype>sales</doctype>
+		<publicID>SalesDTD</publicID>
+		<systemID>dtd/sales.dtd</systemID>
+	</dtd>
+	<editor>
+		<element>customer</element>
+		<element>product</element>
+		<element>invoice</element>
+		<element>lineitem</element>
+		<class>org.merlotxml.merlot.plugins.sales.IdrefEditor</class>
+	</editor>
+	<!--
+		To display a column which shows the best attribute with a non-null
+		value, set the attribute of that column as "~".
+	 -->
+	<tree-table>
+		<column name="Name" attribute="name"/>
+		<column name="Id" attribute="id"/>
+		<column name="~" attribute="~"/>
+	</tree-table>
+	<!--
+		This display text is used in two places:
+		1. For display in a column with attribute "~".
+		2. For display in an IDREF ComboBox.
+		Unless an element is listed under fixed-properties, the property to be
+		displayed will be determined by the default-property-order. As each
+		property in the order yields null, the next is attempted.
+		A property is either the name of an attribute or a type of attribute, or
+		the constant "CHILD_TEXT". If it is a type of attribute, then the first 
+		attribute of that type with a non-null value is displayed. "CHILD_TEXT" is
+		used to display the text of a child node when there is exactly one child.
+		Valid attribute types are NMTOKEN, CDATA, IDREF, TOKEN_GROUP, etc.
+	-->
+	<display-text>
+		<default-property-order>
+			<attribute-name name="name"/>
+			<attribute-type name="NMTOKEN"/>
+			<attribute-type name="IDREF"/>
+			<attribute-type name="TOKEN_GROUP"/>
+			<attribute-type name="CHILD_TEXT"/>
+		</default-property-order>
+		<fixed-property element-name="customers">
+			<attribute-type name="CHILD_TEXT"/>
+		</fixed-property>
+		<fixed-property element-name="invoice">
+			<attribute-type name="CDATA"/>
+		</fixed-property>
+	</display-text>
+</dtd-plugin>

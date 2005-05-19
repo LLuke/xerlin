@@ -1,0 +1,182 @@
+Changes 
+Xerlin 1.2                                            Jun 29, 2002
+-------------------------------------------------------------------
+Xerlin released
+1.1-alpha4 -> 1.1-beta1                               Oct 16, 2001
+-------------------------------------------------------------------
+- added: user preference panel, user prefs directory [JL]
+- added: plugins can depend on other plugins, hierarchical classloading [KC]
+- added: downloaded plugin caching [KC]
+- changed: document editor interface simplified, tabbed pane removed [KC, JL]
+- added: back, cancel actions in toolbar for new simplified editing model [JL]
+- changed: plugins jars are always expanded to speed up loading [KC]
+- changed: MacOS X app uses mac-style menu bar now instead of java-style (req's OS X 10.1) [KC]
+- fixed: Libraries work again [KC]
+- fixed: issues with processing instruction nodes [JL]
+- fixed: usability issues with ChildTableEditor [KC]
+- changed: default indent level to 2 spaces to save some space [KC]
+- fixed: FIXED type attributes are now always saved in the XML [JL]
+
+1.1-alpha3 -> 1.1-alpha4                              Aug 20, 2001
+-------------------------------------------------------------------
+- added: JavaHelp users guide [Justin Lipton]
+- added: NodeAction plugin type [Evert Hoff]
+- added: Ability to change Xerlin menus from a plugin [Justin Lipton]
+- added: setting for whether or not to write out default attributes [Justin Lipton]
+- changed: Switched from xml4j 2.x to Xerces 1.4 [Evert Hoff]
+- changed: Add menu now how all allowable types and puts them where they
+  can go in the content model [Justin Lipton]
+- changed: IDManager has alternative methods for ID generation [Evert Hoff]
+
+
+1.1-alpha2 -> 1.1-alpha3                              May 18, 2001
+--------------------------------------------------------------------
+- added: node description hash map [Justin Lipton]
+- added: Russian localization [AW]
+- changed: tree node selection is changed when user chooses different
+  tab in the tabbed pane [Justin Lipton]
+- fixed: root node can no longer be deleted or cut [Alexey Badenko]
+- fixed: width of split pane on windows enlarged [Justin Lipton] 
+- fixed: xerlin starts up with windows L&F on windows machines now instead of metal [kc]
+- fixed: ChildTableEditor stays in sync with the node tree better [Tim McCune]
+
+
+1.1-alpha1 -> 1.1-alpha2                             April 9, 2001
+--------------------------------------------------------------------
+- added: MacOS X Application bundle for launching Xerlin [kc]
+- added: Node menu as alternative to right-click context menu [kc]
+- added: Status indication for plugin loading [kc]
+- added: checking for valid NMTOKEN values in generic editor
+- changed: GenericDOMEditPanel can be subclassed easier [Justin Lipton]
+- changed: Dialogs are no longer internal - fixed bug 2 & 7 [Justin Lipton]
+- changed: enum attributes with "true" and "false" rendered as checkboxes [Tim McCune]
+- changed: ChildTableEditor uses a split pane to separate attrs and nodes [kc]
+- fixed: PluginClassLoader - several bugs fixed
+- fixed: bug with document activation after another is closed [Justin Lipton]
+- fixed: Null Pointer during startup [kc]
+- fixed: GenericDOMNode layout provides scrolling [kc]
+- fixed: NullPointer in DTDDocumentImpl [Trent Lewis]
+
+1.0.1 -> 1.1-alpha1                                  March 8, 2001
+--------------------------------------------------------------------
+
+- added: ID/IREF attribute support [Jean-Michel Sizun]
+- added: Document validation highlighting with colors on invalid nodes
+          [Jean-Michel Sizun]
+- added: useful methods for plugins to set properties, node
+         ownership [Justin Lipton]
+- added: system property to provide a list of URL's to load as plugins
+	  [Tim McCune]
+- added: configurability of tree table columns and display text, 
+         example plugin.xml [Evert Hoff]
+- added: French localization resources [Jean-Michel Sizun]
+- changed: XSLT plugin can ask for the stylesheet, reports errors to
+           the user in the GUI. Launches platform browser via BrowserLauncher
+	    [Kelly Campbell]
+- changed: refactoring of GenericDOMEditPanel [Jean-Michel Sizun]
+- changed: made split-pane one-touch-expandable [Jean-Michel Sizun]
+- changed: build switched over to Ant >1.2 completely. Makefiles removed
+            [Kelly Campbell, Tim McCune]
+- fixed: i18n patches for UI and error strings [Jean-Michel Sizun]
+- fixed: PluginClassLoader overloads find methods, uses 
+         parent class loader, fix for JDK1.2.2 ClassCircularityErrors
+          [Petr Kocicka, Kelly Campbell]
+
+1.0 -> 1.0.1                                    January 29, 2001
+--------------------------------------------------------------------
+Bugfix release:
+Bug 122: memory leak with DOMEditors not being released
+
+Added fix for action plugin menu items from Petr Kocicka 
+  [petr.kocicka@hyperqbs.org]
+
+Added extra methods usable by plugins (Justin Lipton)
+
+1.0rc2 -> 1.0                                   November 13, 2000
+--------------------------------------------------------------------
+No changes. Releasing 1.0 FCS based on RC2
+
+
+1.0rc1 -> 1.0rc2				September 14, 2000
+--------------------------------------------------------------------
+Bug fixes:
+  Reverted to original save file serialization code instead of using
+        Xerces XMLSerializer. Problems with extra spacing and hard 
+	to read XML files should be gone.
+  Fixed protected save method in GenericDOMEditPanel to allow 
+	plugins to overide attribute values when a UI component
+	exists with the same name as the attribute.
+  Turned off more debugging statements. Hopefully we got them 
+ 	all out from the production mode.
+  
+
+1.0b3 -> 1.0rc1					September 1, 2000
+--------------------------------------------------------------------
+Bug fixes:
+  PCDATA attribute editor in generic edit panel didn't work on saved
+        documents. Fixed visibility of MerlotDOMText nodes for this.
+  Patched XML4j so it can find relative dtd's included in the main 
+	or other dtd's.
+  Removed or turned off lots of unneccessary debugging 
+
+1.0b2 -> 1.0b3					August 24, 2000
+--------------------------------------------------------------------
+New features:
+  Ability to specify the root element when creating a new document
+	rather than xerlin using the filename of the dtd file.
+  Better support for action plugins
+	XSLT action plugin example included in distribution
+  German localized UI and Error resource properties files
+	submitted by Stefan Heller <sh@mendelson.de>
+
+Bug fixes:
+  More encoding types supported, including correct handling of
+	windows Code Page 1252 (Cp1252) encoding when converting
+	an existing document with no encoding into a properly 
+	encoded XML document.
+  Relative URIs for SYSTEM paths to dtds handled properly.
+	Also relative URI's to other dtd documents handled.
+  "Shadow" root node removed. This was really just the DOCTYPE 
+	node showing up for some reason with certain plugins.
+  Several bugs with Processing Instructions fixed.
+  Removed FilenameFilter use for Windows FileDialogs
+  
+
+1.0b1 -> 1.0b2					June 27, 2000
+--------------------------------------------------------------------
+New features:
+  handles encoding declarations in the <?xml?> declaration.
+     defaults to UTF-8 for new files
+  enforces #REQUIRED attributes in the Generic node editor
+  JavaDoc api documentation updated, and included with binary 
+    distribution
+
+Bug fixes:
+  fixed some major bugs dealing with the Add-> menus based on the
+    dtd content model
+  uses DTDChooser when DTD files are missing instead of previous
+    dtd file finder dialog.
+  PluginClassLoader handles embedded jar files in the lib directory,
+    handles getting resource streams better.
+
+
+0.9a4 -> 1.0b1
+--------------------------------------------------------------------
+New features include:
+  the new plugin architecture (thanks Tim)
+  a DTD chooser list, and DTD cacheing
+  Add->after and before menus.
+  Add->special menu moved under the main add-> popup
+  Plugins menu added for action plugins
+  New application icon
+  New background icon
+  Text items text displayed in the Name column
+
+
+Bug fixes include:
+  the more-> popup menu when the popup menu is too long
+  some bugs fixed in windows menu
+  document windows can no longer start out bigger than the frame
+  details stack trace window is sized properly now
+  nodes in the Add-> popup menu are alphabetized
+

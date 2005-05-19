@@ -1,0 +1,35 @@
+This list is stuff we are looking for someone to work on in Xerlin. These
+are listed somewhat in order of priority.
+
+1. Documentation
+     a. End-user documentation
+     b. Developer docs
+         i. Plugin development guide - Tim McCune
+        ii. project architecture - Kelly Campbell
+     c. javadocs in source code
+
+2. DTD/Schema catalog support
+	integrate with DTDCache
+
+3. Make PluginClassLoader faster/better, especially for handling embedded jars
+
+4. Handling different attribute types like ID, IDREF, NMTOKEN, etc. properly.
+    ID fields should be kept in a map somewhere so that no duplicate
+    id's are entered by the user. IDREFs must refer to a valid ID in the
+    document.
+
+5. User preferences dialog
+
+6. Find function based on XPath expressions
+
+7. Localize the menus and other resources in org.merlotxml.merlot.resource 
+    for languages other than English
+
+
+Plugin wishlist
+---------------
+DTD Plugins:
+	Ant build files
+	Tomcat config files
+	WAR web.xml deployment descriptors
+

@@ -1,0 +1,335 @@
+<html><head><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Xerlin 1.1 User Guide</title><meta content="DocBook XSL Stylesheets V1.44" name="generator"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div id="N2" class="book"><div class="titlepage"><div><h1 class="title"><a name="N2"></a>Xerlin 1.1 User Guide</h1></div><div><h3 class="author">Kelly A. Campbell</h3><div class="affiliation"><span class="jobtitle">Software Engineer<br></span><span class="orgname">ChannelPoint, Inc.<br></span></div><h3 class="author">Justin Lipton</h3><div class="affiliation"><span class="jobtitle">Product Manager<br></span><span class="orgname">SpeedLegal<br></span></div></div><div><p class="copyright">Copyright &copy;  
+This User Guide is based on a document originally prepared for the Merlot 
+XML editor, the original open source project on which Xerlin is based.  The
+original Merlot User Guide was written by Kelly Campbell, and is copyright
+(c) 2000 Channelpoint, Inc.  The Xerlin User Guide is being made available
+as an integral part of the Xerlin open source project, and any contributions
+to the User Guide are accepted on the basis that they will be made freely
+available to users of Xerlin, subject to the Xerlin open source license.
+	</p></div><div><div class="revhistory"><table summary="Revision history" width="100%" border="1"><tr><th colspan="2" valign="top" align="left"><b>Revision History</b></th></tr><tr><td align="left">Revision 1.1</td><td align="left">July 7, 2002</td></tr><tr><td colspan="2" align="left">Draft for Xerlin 1.2 release</td></tr><tr><td align="left">Revision 1.0</td><td align="left">September 10, 2000</td></tr><tr><td colspan="2" align="left">Initial draft for 1.0 release</td></tr></table></div></div><hr></div><div class="chapter"><div class="titlepage"><div><h2 class="title"><a name="chapt-intro"></a>Chapter 1. Introduction</h2></div></div><p>Xerlin (pronounced zer-lin)
+      is an application for creating XML files. It runs on Java 2
+      virtual machines (JDK1.2.2 or JDK1.3). Xerlin simplifies how
+      you interact with an XML file by hiding the raw text form of
+      XML. It gives a user interface for adding, removing, and
+      rearranging XML elements. It also gives a nice interface for
+      editing the attributes of elements. Xerlin has been
+      developed for end users who may not be familiar with XML,
+      but it also provides a useful interface for people who know
+      XML really well.</p><p>An example of what the
+      Xerlin interface looks like is given in <a href="#fig-intro-merlot-interface" title="Figure 1.1. Xerlin Interface">Figure 1.1</a>       
+      <div class="figure"><p><a name="fig-intro-merlot-interface"></a><b>Figure 1.1. Xerlin Interface</b></p><div class="mediaobject"><img src="images/fig-intro-merlot-interface.gif"><div class="caption"><p>A screenshot of the Xerlin XML interface</p></div></div></div>
+    </p><div class="section"><a name="div-intro-about-xml"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="div-intro-about-xml"></a>About XML</h2></div></div><p>A full explanation
+	of XML is beyond the scope of this document, however we
+	will cover some of the basic XML concepts you will need
+	to know in order to use Xerlin prodcutively.
+	XML stands for eXtensible Markup
+	Language. It is similar to HTML,
+	HyperText Markup Language, except users can create their
+	own tags to fit their application needs.</p><div class="section"><a name="div-intro-elements"></a><div class="titlepage"><div><h3 class="title"><a name="div-intro-elements"></a>Elements, Attributes, and Content</h3></div></div><p>The basic
+	  construct in XML is called an
+	  <span class="emphasis"><i>element</i></span>. For people familiar
+	  with HTML, you might know this as a "tag".
+	  For example, HTML has an &lt;img&gt; element for
+	  putting graphics on a web page. Elements have a
+	  name, zero or more attributes, and possibly some
+	  content. In the raw text form of an XML document,
+	  elements start with a beginning tag of the element
+	  name enclosed within angle brackets (&lt; &gt;). XML
+	  elements must have a closing tag of angle brackets
+	  enclosing a slash and the element name. If the
+	  element has no content, this slash can be inserted
+	  at the end of the element's starting tag
+	  immediately preceeding the trailing angle bracket.
+	  An example of an element is given in 
+	  <a href="#example-intro-xml-elements-raw" title="Example 1.1. ">Example 1.1</a>
+	</p><div class="example"><p><a name="example-intro-xml-elements-raw"></a><b>Example 1.1. </b></p><pre class="programlisting">
+   &lt;elementname attribute="value"&gt;content&lt;/elementname&gt;
+	  </pre></div><p>
+	  <span class="emphasis"><i>Attributes</i></span> are named values
+	  associated with an element. An example of an
+	  attribute is shown above in <a href="#example-intro-xml-elements-raw" title="Example 1.1. ">Example 1.1</a> The
+	  <span class="emphasis"><i>content</i></span> of element can be other
+	  elements, text, or both. When an element has both
+	  text and other elements, it is known as "mixed
+	  content". Text content is also known as
+	  <span class="emphasis"><i>character data</i></span>,
+	  PCDATA, or
+	  CDATA.  </p><p>Xerlin
+	  supports most of these constructs of XML except
+	  CDATA. CDATA starts with <tt>&lt;![CDATA[</tt> and ends with
+	  <tt>]]&gt;</tt>. CDATA items are not
+	  currently supported as of Xerlin 1.2, but should be
+	  supported in a future release.</p></div><div class="section"><a name="div-intro-dtd"></a><div class="titlepage"><div><h3 class="title"><a name="div-intro-dtd"></a>DTDs and Schemas</h3></div></div><p>XML uses something called
+	  a Document Type Definition (DTD)
+	  to determine what elements are valid for an XML
+	  file, and what they can contain. A newer technology
+	  called XML Schema has been introduced to replace
+	  DTD's. However since this is such a new
+	  technology (it hasn't been finalized as of this
+	  writing), and the parser technologies Xerlin has
+	  been built on top of don't support it, Xerlin
+	  doesn't support Schemas in version 1.0.</p><p>To be able to add elements and create a valid
+	  XML document, Xerlin requires a DTD in order to
+	  work. There are many different DTDs available for
+	  different applications, and there are books and
+	  tutorials available on creating DTDs. Without a DTD,
+	  Xerlin cannot present it's menu of what
+	  elements can be added into the document. You can
+	  view and edit documents which don't have a DTD,
+	  but you will not be able to add anything new to
+	  them.</p><p>The DTD is specified in an XML
+	  document in a special element called the
+	  <span class="emphasis"><i>DOCTYPE</i></span>. This document type
+	  declaration includes the name of the root element,
+	  an optional PUBLIC identifier, and a manditory
+	  SYSTEM identifier. Xerlin handles the DOCTYPE
+	  declaration and the identifiers behind the scenes
+	  for you. A future version may give you more access
+	  to edit these items directly.</p></div></div></div><div class="chapter"><div class="titlepage"><div><h2 class="title"><a name="N93"></a>Chapter 2. Installation</h2></div></div><p>Xerlin is very simple to install. This chapter will
+      tell you  
+      <div class="itemizedlist"><ul compact="compact"><li><a name="N9B"></a>what you need to download</li><li><a name="N9E"></a>how to unpack the distribution</li><li><a name="NA1"></a>how to check that your installation works</li></ul></div>
+    </p><div class="section"><a name="NA6"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="NA6"></a>Requirements</h2></div></div><p>Xerlin requires a computer system with the following:  
+	<div class="itemizedlist"><ul compact="compact"><li><a name="NAD"></a>Java 2 Standard Edition (see below)</li><li><a name="NB0"></a>Relatively fast processor (300Mhz or higher for Intel architecture
+                        chips)</li><li><a name="NB3"></a>At least 32MB of RAM, 64MB or more recommended</li></ul></div>
+      </p><p>Xerlin requires a Java Virtual Machine
+	(JVM) which implements Sun's Java 2 Standard
+	Edition. Recommended versions are JDK or JRE version
+	1.2.2 and later. Xerlin has been tested to work with
+	Sun's JDK 1.2.2 and 1.3 on Windows, Linux x86, and
+	Solaris (x86 and sparc) platforms. It has also been
+	tested with IBM's JDK 1.3 on Linux. Other platforms
+	with a working JVM of these versions should work fine,
+	but haven't been fully tested. Sun's Java 2 SE
+	is available from <a href="http://java.sun.com/j2se/" target="_top">http://java.sun.com/j2se/</a>.
+	You need either the Runtime Environment, or the SDK.
+      </p><p>Note: As of this writing, there is no
+	  Java 2 Platform for the classic MacOS (7, 8, or 9).
+	  However, MacOS X has a Java 2 Virtual Machine which
+	  we have not yet had a chance to test Xerlin
+	  with.</p></div><div class="section"><a name="NBF"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="NBF"></a>Download</h2></div></div><p>The latest release of
+	Xerlin is always available at <a href="http://www.xerlin.org/" target="_top">http://www.xerlin.org/</a>.
+	Click on the Download link in the navigation bar.
+	Download the current release for your system. There is a
+	Zip file for Windows users, and a Gzipped Tar file for
+	UNIX users. You just need the binary release to run
+	Xerlin. The source distribution is available separately
+	for those developers who want to use it.</p></div><div class="section"><a name="NC8"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="NC8"></a>Unpack</h2></div></div><p>You can unpack the distribution anywhere you want
+	on your system. Simply expand the zip or tar file and
+	move the Xerlin-1.2 directory it creates where you want
+	it.</p></div><div class="section"><a name="NCD"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="NCD"></a>Run Xerlin</h2></div></div><p>To run Xerlin, simply double-click the 
+	<tt>Xerlin.bat</tt> application if
+	you're on Windows, or run the
+	<tt>Xerlin.sh</tt> shell script on UNIX (you
+	may need to make it executable first). You can also
+	start Xerlin from a command prompt with 
+	<b>java -jar Xerlin-1.2.jar</b>.
+	The Xerlin splash screen should appear, and begin
+	loading the application. If any major errors occur
+	during startup, some kind of error message may appear in
+	the command prompt terminal window.        </p><p>  If this starts up and gives you a blank window
+	with menus at the top, you have successfully installed
+	Xerlin. The next chapter will get you started in using
+	Xerlin to create and edit XML files.       </p></div></div><div class="chapter"><div class="titlepage"><div><h2 class="title"><a name="NE0"></a>Chapter 3. Working With XML Documents</h2></div></div><p>In this chapter we will cover some of the basics of
+      creating XML documents with Xerlin including  
+       <div class="itemizedlist"><ul compact="compact"><li><a name="NE8"></a>creating a new XML document from a DTD</li><li><a name="NEB"></a>adding, editing, and deleting elements</li></ul></div>
+    </p><p>The Xerlin user
+      interface is shown in <a href="#fig-interface-callouts" title="Figure 3.1. User Interface">Figure 3.1</a> It has the typical
+      application menus such as <font size="2" face="arial,helvetica"><b>File</b></font> and
+      <font size="2" face="arial,helvetica"><b>Edit</b></font>, and a shortcut Toolbar. Multiple
+      document windows can be open at one time, and managed with
+      the <font size="2" face="arial,helvetica"><b>Windows</b></font> menu and the actions available in
+      the titlebar of each window. </p><div class="figure"><p><a name="fig-interface-callouts"></a><b>Figure 3.1. User Interface</b></p><div class="mediaobject"><img src="images/fig-interface-callouts.gif"></div></div><p> At the left is the Element Tree which shows the
+      structure of the xml document. If you've worked with
+      the DOM interface for XML, this tree is just a graphical
+      representation of the DOM document. To the right is the
+      attribute edit panel where you set the attributes for an
+      element and where plugins can add specialized element
+      editors. </p><div class="section"><a name="N10D"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N10D"></a>Creating a new document</h2></div></div><p>Xerlin can create new
+	documents, or work with existing ones. In both cases,
+	you must have a valid DTD describing the possible
+	structure of your document as dicussed in 
+	<a href="#div-intro-dtd" title="DTDs and Schemas">the section called &ldquo;DTDs and Schemas&rdquo;</a> To start a new document,
+	select <font size="2" face="arial,helvetica"><b>New File</b></font> from the
+	<font size="2" face="arial,helvetica"><b>File</b></font> menu, or click the New File button
+	<span class="inlinemediaobject"><img src="images/toolbar-newfile.gif"></span> on the toolbar.
+      </p><p>When you create a new document,
+	Xerlin must first setup the DOCTYPE for the XML file.
+	First, you must select a DTD file. Xerlin brings up the
+	DTD Chooser panel shown in <a href="#fig-dtd-chooser" title="Figure 3.2. DTD Chooser Panel">Figure 3.2</a> for you to select a DTD from
+	a plugin or from your local filesystem.  </p><div class="figure"><p><a name="fig-dtd-chooser"></a><b>Figure 3.2. DTD Chooser Panel</b></p><div class="mediaobject"><img src="images/fig-dtd-chooser.gif"><div class="caption"><p>Select a DTD, or Browse your filesystem
+	      for one, then click OK</p></div></div></div><p>The DTD's shown
+	initially are from DTD plugins installed in the Xerlin
+	plugins directory (see <a href="#chapt-plugins" title="Chapter 5. Plugins">Chapter 5</a>).
+	The labels given are the DTD's PUBLIC identifier
+	given by the plugin config. When you've opened
+	documents or selected other DTD's on your
+	filesystem, those new DTD's will also show up on
+	your DTD Chooser until you quit Xerlin. If a DTD
+	doesn't have a PUBLIC id, the SYSTEM id is shown on
+	the DTD Chooser instead. Select the DTD you want to use,
+	and click the OK button.</p><p>If there are
+	errors in the DTD file, an error message will be given
+	such as in <a href="#fig-dtd-error" title="Figure 3.3. Error in a DTD">Figure 3.3</a> You will need
+	to correct these errors in the DTD before you can edit a
+	document using that DTD.    
+	<div class="figure"><p><a name="fig-dtd-error"></a><b>Figure 3.3. Error in a DTD</b></p><div class="mediaobject"><img src="images/fig-dtd-error.gif"></div></div> 
+      </p><p>If
+	you're using a DTD from your filesystem Xerlin will
+	ask for a Public id. If you don't want to set a
+	public id for the DTD, you can just click the
+	<font size="2" face="arial,helvetica"><b>None</b></font> button. Next Xerlin will ask
+	for the root element as in <a href="#fig-root-element-chooser" title="Figure 3.4. Root Element Chooser">Figure 3.4</a> You can select one
+	from the list, or type one if you know which root
+	element you want. Once you've created the document,
+	you cannot change the DOCTYPE, including the root
+	element, from within Xerlin. Note that DTD plugins can
+	setup the DOCTYPE without involving the end user.
+      </p><div class="figure"><p><a name="fig-root-element-chooser"></a><b>Figure 3.4. Root Element Chooser</b></p><div class="mediaobject"><img src="images/fig-root-element-chooser.gif"></div></div><p>Once you have a new
+	document (<a href="#fig-new-file" title="Figure 3.5. New Example Document">Figure 3.5</a>)
+	you are ready to start adding new elements to it.
+	<div class="figure"><p><a name="fig-new-file"></a><b>Figure 3.5. New Example Document</b></p><div class="mediaobject"><img src="images/fig-new-file.gif"></div></div> 
+      </p></div><div class="section"><a name="N16D"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N16D"></a>Adding Nodes</h2></div></div><p>To add new
+	elements to your document, right-click on the item you
+	want to add something to, and go to the
+	<font size="2" face="arial,helvetica"><b>Add</b></font> menu as shown in 
+	<a href="#fig-add-node" title="Figure 3.6. Add Menu">Figure 3.6</a>. Xerlin displays just the
+	elements that are valid to add at the point specified by
+	the element you right-clicked on. There are also menus
+	for adding elements Before or After the given element.
+	These menus are all built from the DTD at runtime, so
+	you can only create documents which are valid according
+	to the DTD.</p><div class="figure"><p><a name="fig-add-node"></a><b>Figure 3.6. Add Menu</b></p><div class="mediaobject"><img src="images/fig-add-node.gif"></div></div><p>When you add an element
+	into another, it places it at the end of the parent
+	element. Use the Add-&gt;Before and Add-&gt;After if you
+	need to be more precise about where a new element should
+	be placed.</p><p>You can also add comments and
+	processing instructions from the Add-&gt;Special menu.
+	These show up as "#comment" and
+	"?pi?" in the Element Tree.</p></div><div class="section"><a name="N187"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N187"></a>Editing Attributes</h2></div></div><p>When you add a new
+	item to the Element Tree, the element's attribute
+	editor is added to the right-hand pane allowing you to
+	set attributes, and text for the new node. 
+	<a href="#fig-attribute-edit" title="Figure 3.7. Editing
+	    Attributes">Figure 3.7</a> shows the attribute
+	editor for a new &lt;p&gt; using the Xerlin Example DTD.
+	
+	<div class="figure"><p><a name="fig-attribute-edit"></a><b>Figure 3.7. Editing
+	    Attributes</b></p><div class="mediaobject"><img src="images/fig-attribute-edit.gif"></div></div>  
+      </p></div><div class="section"><a name="div-moving-removing"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="div-moving-removing"></a>Moving and Removing Elements</h2></div></div><p>There are two ways to move
+	elements and restructure your document. On platforms
+	which support Drag &amp; Drop, you can drag an element
+	from the tree and drop it into a place where the element
+	is valid according to the DTD. You can drop it within
+	the same document or on another document of the same
+	type. Lines and rectangles are drawn on the tree as
+	you're dragging over it to show where the element
+	would be dropped if you release the mouse. You can also
+	drag items into the library as dicussed in 
+	<a href="#chapt-library" title="Chapter 4. Using the Library">Chapter 4</a> If the drop location does not
+	allow the item being dragged to be inserted at that
+	point, an error message will appear for a few seconds in
+	the status bar at the bottom of the document window.
+      </p><p>The second and probably more
+	reliable method for moving elements is to use Copy or
+	Cut, and Paste. Use the copy and paste menu items
+	available when you right-click on an element. These
+	actions don't work from the menus for elements in
+	the tree view with Xerlin 1.2. You can paste items into,
+	after, or before another node. This works the same as
+	the Add, Add-&gt;Before, and Add-&gt;After actions. Only
+	valid pastes according to the DTD will be allowed as
+	shown in <a href="#fig-paste-node" title="Figure 3.8. Pasting Nodes">Figure 3.8</a> </p><div class="figure"><p><a name="fig-paste-node"></a><b>Figure 3.8. Pasting Nodes</b></p><div class="mediaobject"><img src="images/fig-paste-node.gif"></div></div><p>To remove
+	elements, simply right-click on what you want to
+	removed, and choose <font size="2" face="arial,helvetica"><b>Delete</b></font>.
+	This removes the highlighted element and its
+	sub-elements. If you accidentally delete something you
+	didn't want to, Xerlin supports up to 10 levels of
+	Undo. Undo also works for Cut, Paste, and Adding of
+	elements.  </p></div></div><div class="chapter"><div class="titlepage"><div><h2 class="title"><a name="chapt-library"></a>Chapter 4. Using the Library</h2></div></div><p>Xerlin has a feature which allows you
+      to reuse elements between documents, or create templates of
+      structures you use often. This is called the Library. You
+      can drag any item from the Element Tree of a document into
+      the library creating a new reusable element.  </p><div class="section"><a name="N1BE"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N1BE"></a>Creating a New Library</h2></div></div><p>To use a
+	Library, you first need to create a new one, or open an
+	existing one. To create a new one, simply choose the
+	<font size="2" face="arial,helvetica"><b>New Library</b></font> item on the
+	<font size="2" face="arial,helvetica"><b>File</b></font> menu. Xerlin will ask for a name
+	for the library. This is just a symbolic name you can
+	use to keep track of different libraries. This name is
+	used at the title of the library window. Next you will
+	be given a Save File dialog. Choose a filename and
+	location for the library file. Libraries are saved
+	automatically when you close it, or when you quit
+	Xerlin, so the file location must be determined before
+	creating the library.</p><p>When you first
+	have a new library, the window is empty. You must add
+	sections to it before you can add any elements to the
+	library. These sections provide a way to organize many
+	items into categories. To add a new section, right-click
+	in the library window, and choose <font size="2" face="arial,helvetica"><b>New
+	  Section</b></font> as shown in <a href="#fig-library-new-section" title="Figure 4.1. New Section in a Library">Figure 4.1</a>
+      </p><div class="figure"><p><a name="fig-library-new-section"></a><b>Figure 4.1. New Section in a Library</b></p><div class="mediaobject"><img src="images/fig-library-new-section.gif"></div></div><p>After you have a
+	section, you can add items by drag &amp; drop as
+	discussed in <a href="#div-moving-removing" title="Moving and Removing Elements">the section called &ldquo;Moving and Removing Elements&rdquo;</a> or
+	copy and paste into the section you want to put
+	something in.   </p></div><div class="section"><a name="N1E3"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N1E3"></a>Using Elements from a Library</h2></div></div><p>Once you have a library with your templates and
+	other elements you want to reuse, you can use the items
+	by copy &amp; paste, or drag &amp; drop. The same
+	DTD-based rules apply to elements coming from the
+	library as to elements from other documents. If there is
+	more than one element in a library item, then only the
+	first element is checked for validity with the
+	destination. Also, Xerlin 1.2 does not enforce that the
+	document an element came from and the document it's
+	being pasted into have the same DTD or doctype.</p><p>The Library is automatically saved when you quit,
+	or when you close the library window. If you
+	specifically want to make sure your changes to the
+	library are saved, you need to close the library
+	window.</p></div></div><div class="chapter"><div class="titlepage"><div><h2 class="title"><a name="chapt-plugins"></a>Chapter 5. Plugins</h2></div></div><p>Xerlin supports two different kinds of plugins, DTD plugins and
+      Action plugins. These plugins can be developed for
+      application-specific uses of Xerlin as discussed in the
+      <a href="http://www.xerlin.org/docs/plugins/plugin-dev-guide.html" target="_top">Plugin
+	Development Guide</a>.  
+    </p><p>Plugins
+      are usually a jar file which you simply install in the
+      <tt>plugins</tt> directory of Xerlin. Xerlin 1.2
+      includes two example plugins, the example plugin, and the
+      XSLT plugin. The Example plugin has a very simple DTD and
+      one custom editor which allows you to pick a color from a
+      color chooser. The XSLT plugin translates an xml document
+      using a &lt;?xml-stylesheet href="url"?&gt;
+      processing instruction.  
+    </p><p>For more information on plugins, and to download thirdparty plugins for Xerlin, see the Xerlin web site.</p><div class="section"><a name="N1FC"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N1FC"></a>DTD Plugins</h2></div></div><p>DTD Plugins provide a
+	way to add DTDs to Xerlin's DTD Chooser, and
+	special editing actions for specific DTDs. DTD plugins
+	show up on the Help-&gt;About Plugins menu, but not on
+	the <font size="2" face="arial,helvetica"><b>Plugins</b></font> menu itself. When you
+	start a new document or edit an existing document with a
+	PUBLIC identifier which is the same as one specified by
+	a DTD plugin, the DTD and custom editors associated with
+	that plugin are used. DTD plugins can also provide the
+	SYSTEM identifer and the root element to use for that
+	DTD.</p><p>The Xerlin Example plugin has a
+	custom editor which appears where there is a color
+	attribute on elements for that DTD as shown in 
+	<a href="#fig-plugin-example-color" title="Figure 5.1. Custom Color Attribute Editor">Figure 5.1</a> This attribute
+	would normally have a textbox where you can enter the
+	hex value for a color, but with the example plugin, you
+	get a button which allows you to use a graphical color
+	chooser. The color you choose is converted to the hex
+	notation and saved in the xml file in that format.
+      </p><div class="figure"><p><a name="fig-plugin-example-color"></a><b>Figure 5.1. Custom Color Attribute Editor</b></p><div class="mediaobject"><img src="images/fig-plugin-example-color.jpg"></div></div></div><div class="section"><a name="N214"></a><div class="titlepage"><div><h2 class="title" style="clear: both"><a name="N214"></a>Action Plugins</h2></div></div><p>Action plugins
+	perform an action on the foreground document. For
+	example, running an XSLT transformation on the document. Action plugins are listed in the <font size="2" face="arial,helvetica"><b>Plugins</b></font> menu.
+      </p></div></div><div class="colophon"><h2 class="title"><a name="N21D"></a>Colophon</h2><p>This publication was produced using the
+      <a href="http://www.docbook.org/xml/index.html" target="_top">DocBook XML
+	DTD</a> with Xemacs and the PSGML package, and with
+      Xerlin 1.2. The HTML version is rendered via Norm
+      Walsh's <a href="http://www.nwalsh.com/docbook/xsl/index.html" target="_top">DocBook
+	XSLT stylesheets</a> using
+      <a href="http://xml.apache.org/xerces-j/index.html" target="_top">Xerces-J</a>
+      and <a href="http://xml.apache.org/xalan/index.html" target="_top">Xalan-J</a>.
+      The PDF version is rendered with Norm Walsh's XSLT
+      stylesheets and <a href="http://xml.apache.org/fop/index.html" target="_top">FOP</a>.
+      Graphics were produced using <a href="http://www.gimp.org/" target="_top">The GIMP</a> on Linux.
+        </p><p>The HTML document is best viewed with Explorer 5.0 or later, or Mozilla/Netscape 6 because of the CSS stylesheet used to format the XSLT generated document.</p></div></div></body></html>

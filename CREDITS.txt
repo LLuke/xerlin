@@ -1,0 +1,21 @@
+  
+**** COMMITERS ****
+Kelly Campbell (original release coordinator, project originator)
+Tim McCune (project originator)
+
+Frank Blecha 
+Justin Lipton (release coordinator)
+Randy Murrish 
+Evert Hoff
+
+**** PROJECT CONTRIBUTORS ****
+
+Stefan Heller
+David Lloyd
+Pedro Arnal Puente 
+Jean-Michel Sizun
+Spencer Smith
+Petr Kocicka
+A.W.
+Alexey Badenko
+Trent Lewis
