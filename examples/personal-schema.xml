@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<personnel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="personal.xsd">
+  <person contr="false" id="Big.Boss" note="This is a note." salary="$100">
+    <name>
+      <family>Boss</family>
+      <given>Big</given>
+    </name>
+    <link subordinates="one.worker two.worker three.worker four.worker five.worker"/>
+    <email>chief@foo.com</email>
+  </person>
+  <person contr="false" id="one.worker" salary="0">
+    <name>
+      <family>Worker</family>
+      <given>One</given>
+    </name>
+    <email>one@foo.com</email>
+    <link manager="Big.Boss" subordinates="two.worker"/>
+    <spouse first-name="One" last-name="Boss"/>
+  </person>
+  <person contr="false" id="one.worker" salary="0">
+    <name>
+      <family>Worker</family>
+      <given>Two</given>
+    </name>
+    <email>two@foo.com</email>
+    <link manager="Big.Boss" subordinates="three.worker"/>
+  </person>
+  <person contr="false" id="three.worker" salary="0">
+    <name>
+      <family>Worker</family>
+      <given>Three</given>
+    </name>
+    <email>three@foo.com</email>
+    <link manager="Big.Boss" subordinates="four.worker"/>
+  </person>
+  <person contr="false" id="four.worker" salary="0">
+    <name>
+      <family>Worker</family>
+      <given>Four</given>
+    </name>
+    <email>four@foo.com</email>
+    <link manager="Big.Boss" subordinates="five.worker"/>
+  </person>
+  <person contr="false" id="five.worker" salary="0">
+    <name>
+      <family>Worker</family>
+      <given>Five</given>
+    </name>
+    <email>five@foo.com</email>
+    <link manager="Big.Boss"/>
+  </person>
+  <person contr="false" id="jdkj" salary="0"/>
+</personnel>
