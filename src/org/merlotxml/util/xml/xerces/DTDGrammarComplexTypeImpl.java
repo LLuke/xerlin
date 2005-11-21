@@ -110,7 +110,8 @@ public class DTDGrammarComplexTypeImpl extends GrammarComplexType {
             return true;
         }
         // At top of tree, will always be valid.
-        if (_parentComplexType == null) {
+        if (_parentComplexType == null || 
+                !_parentComplexType.getName().equals(parentNode.getNodeName())) {
             _parentComplexType = 
                 _grammarDocument.getTopLevelGrammarComplexType(
                                                     parentNode.getNodeName());
