@@ -62,6 +62,7 @@ import java.util.Vector;
 
 import org.merlotxml.merlot.MerlotDebug;
 import org.merlotxml.util.xml.xerces.DTDDocumentImpl;
+import org.merlotxml.util.xml.xerces.DTDGrammarDocumentImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -161,8 +162,34 @@ public class ValidDocument
         // Temporary measure while changing grammar.
         if (_maindtd != null && _maindtd instanceof DTDDocumentImpl) {
             ((DTDDocumentImpl)_maindtd).setGrammarDocument(grammarDocument);
-        } else
-        MerlotDebug.msg("Cannot set GrammarDocument in DTDDocumentImpl.");
+        } else if (_maindtd==null && grammarDocument!=null 
+                && (grammarDocument instanceof DTDGrammarDocumentImpl)) { 
+            // This can happen for an internal DTD 
+            // This is the lazyInit for an internal DTD - I don't think
+            // that this situation can arise for any situation other than
+            // the internal DTD case
+            DTDDocumentImpl dtddoc = new DTDDocumentImpl(null, null);
+            dtddoc.setGrammarDocument(grammarDocument);
+            _maindtd = dtddoc;
+
+            if (_elements==null) {
+                // Populate the _elements field
+                Enumeration els = dtddoc.getElements();
+                if (els != null) {
+                    _elements = new Hashtable();
+                    _element2DTD = new Hashtable();
+                    while (els.hasMoreElements()) {
+                        DTDElement el = (DTDElement)els.nextElement();
+                        _elements.put(el.getName(), el);
+                        _element2DTD.put(el.getName(), dtddoc);
+
+                    }
+                }
+            }
+
+        } else {
+            MerlotDebug.msg("Cannot set GrammarDocument in DTDDocumentImpl. ");
+        }
     }
     
     public GrammarDocument getGrammarDocument()
