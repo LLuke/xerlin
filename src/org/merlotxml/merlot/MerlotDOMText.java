@@ -96,12 +96,14 @@ public class MerlotDOMText extends MerlotDOMNode
 	
 	public void setText(String s) 
 	{
-		_text.setData(s);
-        MerlotDOMNode parent = getParentNode();
-        if (parent != null)
-		  parent.fireNodeChanged();
-        else
-            MerlotDebug.msg("setText(" + s + "): Not firing node changed, because parent is null.");
+        if (!s.equals(getText())) {
+		    _text.setData(s);
+            MerlotDOMNode parent = getParentNode();
+            if (parent != null)
+		        parent.fireNodeChanged();
+            else
+                MerlotDebug.msg("setText(" + s + "): Not firing node changed, because parent is null.");
+        }
 	}
 
     public Object clone() {
