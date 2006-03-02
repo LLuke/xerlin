@@ -214,6 +214,12 @@ public class DTDChooser implements MerlotConstants {
                             "Got an exception when trying to "
                                 + "obtain the GrammarDocument as a DTD");
                         MerlotDebug.msg("Hopefully it's a schema");
+                        if (!dtdfile.endsWith(".xs") 
+                                && !dtdfile.endsWith(".xsd")) {
+                            String emsg = MerlotResource.getString(ERR, "xml.invalid.dtd.schema");
+                            MerlotError.exception(ex, emsg);
+                            return null;
+                        }
                     }
                     break;
                 }
