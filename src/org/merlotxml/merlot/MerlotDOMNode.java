@@ -1095,6 +1095,7 @@ public class MerlotDOMNode
 			}
 			break;
 		case Node.TEXT_NODE:
+        case Node.CDATA_SECTION_NODE:
 		    String s = ((Text)nd).getData();
 		    if (s!=null && s.equals(DTDConstants.PROCESSING_INSTRUCTION_KEY)) {
 			ret = new MerlotDOMProcessingInstruction(nd,_file);
