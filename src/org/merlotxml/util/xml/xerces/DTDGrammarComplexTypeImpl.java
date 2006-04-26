@@ -106,7 +106,7 @@ public class DTDGrammarComplexTypeImpl extends GrammarComplexType {
     public boolean getIsLocationValid(Element el) {
         Node parentNode = el.getParentNode();
         if (!(parentNode instanceof Element)) {
-            MerlotDebug.msg(" Parent node is not an element.");
+            MerlotDebug.msg(" DTDGrammarComplexTypeImpl.getIsLocationValid: Parent node is not an element.");
             return true;
         }
         // At top of tree, will always be valid.
@@ -125,7 +125,7 @@ public class DTDGrammarComplexTypeImpl extends GrammarComplexType {
         debug(2, "Validating " + el.getNodeName());
         Node parentNode = el.getParentNode();
         if (!(parentNode instanceof Element)) {
-            debug(3, " Parent node is not an element.");
+            debug(3, " DTDGrammarComplexTypeImpl.isValid: Parent node is not an element.");
             int result = validate(el);
             return (result==-1);
         }
@@ -166,8 +166,12 @@ public class DTDGrammarComplexTypeImpl extends GrammarComplexType {
         int ret = -1;
         String elementName = el.getNodeName();
         String[] children = getChildNodeNamesWithoutText(el);
-        debug(2, "   Validating structure for " + elementName
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 2) {
+        	MerlotDebug.msg("   Validating structure for " + elementName
              + ": " + toString(children));
+        }
         return validate(children);
     }
     
@@ -217,10 +221,13 @@ public class DTDGrammarComplexTypeImpl extends GrammarComplexType {
         if (childrenSpec == null) {
             childrenSpec = new QName[0];
         }
-        debug(4, "    Length: " + childrenSpec.length);
-        debug(4, "    Validating childrenspec: ");
-        for (int i = 0; i < childrenSpec.length; i++)
-            debug(4, "    QName: " + childrenSpec[i]);
+        if(debugLevel >= 4) {
+            MerlotDebug.msg("    Length: " + childrenSpec.length);
+            MerlotDebug.msg("    Validating childrenspec: ");
+            for (int i = 0; i < childrenSpec.length; i++) {
+                MerlotDebug.msg("    QName: " + childrenSpec[i]);
+		    }
+		}
         int result = -1;
         try {
             result = model.validate(childrenSpec, 0, childrenSpec.length);

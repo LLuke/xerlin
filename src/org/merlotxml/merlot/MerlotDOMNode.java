@@ -110,6 +110,8 @@ public class MerlotDOMNode
     implements Transferable, Cloneable, MerlotConstants
 {
 
+	private static final int INVALID_INDEX = -1;
+
 	private static final boolean DEBUG = false;
 	
     Icon _bean_gif = null;
@@ -125,6 +127,7 @@ public class MerlotDOMNode
     protected XMLFile     _file;
 	
     protected MerlotDOMNode _parent = null;
+    protected int _indexInParentList = MerlotDOMNode.INVALID_INDEX;
 
     /**
      * The node we were cloned from if any... used for dnd moves so we can
@@ -149,6 +152,9 @@ public class MerlotDOMNode
     MerlotDOMEditor _editor = null;
     
     GrammarComplexType _grammarComplexType = null;
+
+    private int validationQueueIndex = MerlotDOMNode.INVALID_INDEX;
+ 	private Object validationQueueIndexLock = new Object();
 
     public MerlotDOMNode (Node data, XMLFile file) 
     {
@@ -304,14 +310,12 @@ public class MerlotDOMNode
     public int getChildIndex(MerlotDOMNode child) 
 		throws DOMException
     {
-		MerlotDOMNode[] nodes = getChildNodes();
-		for (int i = 0; i< nodes.length; i++) {
-			if (nodes[i].equals(child)) {
-				return i;
-			}
-		}
-		throw new BastardChildException(DOMException.NOT_FOUND_ERR, "Bastard child node");
-		
+    	if(child._indexInParentList == MerlotDOMNode.INVALID_INDEX) {
+    		throw new BastardChildException(DOMException.NOT_FOUND_ERR,
+    				"Bastard child node");
+    	}
+
+    	return child._indexInParentList;
     }
     
 	/** Gets the first child that is non-empty text, or returns null if none
@@ -639,14 +643,12 @@ public class MerlotDOMNode
 		if (updateChildren) {
 			if (nd == null) {
 				if (_parent._children != null) {
-					_parent._children.removeElement(this);
+					_parent.removeChildAndUpdateIndices(this);
 				}
 				
 			}
 			else {
-				if (nd._children != null) {
-					nd._children.addElement(this);
-				}
+				nd.addChild(this);
 			}
 			
 		}
@@ -655,7 +657,50 @@ public class MerlotDOMNode
 		
 		
     }
+
+	private void addChild(MerlotDOMNode nd) {
+		if (_children != null) {
+			synchronized (_children) {
+				_children.addElement(nd);
+
+				nd._indexInParentList = _children.size()-1;
+			}
+		}
+	}
+
+	private void addChildAndUpdateIndices(MerlotDOMNode child, int index) {
+		synchronized (_children) {
+			_children.add(index,child);
+
+			child._indexInParentList = index;
+
+			final int size = _children.size();
+			for(int idx = ++index; idx < size; ++idx) {
+				MerlotDOMNode mdn = (MerlotDOMNode) _children.elementAt(idx);
+
+				++mdn._indexInParentList;
+			}
+		}
+	}
+
+	private void removeChildAndUpdateIndices(MerlotDOMNode child) {
+		synchronized (_children) {
+			// Remove this node from the parent
+			_children.removeElement(child);
+			
+			// Adjust the subsequent cached indices
+			final int size = _children.size();
+
+			for(int idx = child._indexInParentList; idx < size; ++idx) {
+				MerlotDOMNode mdn =
+					(MerlotDOMNode) _children.elementAt(idx);
+
+				--mdn._indexInParentList;
+			}
+		}
+	}
 	
+
     protected void setClonedFrom(MerlotDOMNode[] nd) 
     {
 		_clonedFrom = nd;
@@ -752,7 +797,7 @@ public class MerlotDOMNode
 			parent._children = new Vector();
 		}
 		
-		parent._children.add(ind+1,this);
+		parent.addChildAndUpdateIndices(this, ind+1);
 		
 		setParentNode(parent,false);
 		
@@ -789,7 +834,8 @@ public class MerlotDOMNode
 		if (parent._children == null) {
 			parent._children = new Vector();
 		}
-		parent._children.add(ind,this);
+
+		parent.addChildAndUpdateIndices(this, ind);
 
 		setParentNode(parent,false);
 
@@ -847,7 +893,7 @@ public class MerlotDOMNode
             GrammarComplexType complexType = getGrammarComplexType();
             if (complexType != null) {
             	int insertPosition = getGrammarComplexType().getInsertPosition(parent, childName);
-                	if (insertPosition == -1) {
+                	if (insertPosition == MerlotDOMNode.INVALID_INDEX) {
                     	MerlotDebug.msg("Not appending child - child not allowed here.");
                     	return;
                 	}
@@ -1862,4 +1908,22 @@ public class MerlotDOMNode
         // Refer to MerlotDOMElement.
         return true;
 	}
+
+     public boolean isInValidationQueue() {
+     	synchronized (validationQueueIndexLock) {
+     		return validationQueueIndex != MerlotDOMNode.INVALID_INDEX;
+     	}
+     }
+
+     public int getValidationQueueIndex() {
+     	synchronized (validationQueueIndexLock) {
+     		return validationQueueIndex;
+ 		}
+     }
+
+     public void setValidationQueueIndex(int validationQueueIndex) {
+ 		synchronized (validationQueueIndexLock) {
+ 			this.validationQueueIndex  = validationQueueIndex;
+ 		}
+ 	}
 }

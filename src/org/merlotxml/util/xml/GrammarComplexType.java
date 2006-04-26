@@ -152,7 +152,12 @@ public abstract class GrammarComplexType {
         }
         ret = (GrammarComplexType[])list.toArray(ret);
         String[] retNames = getNames(ret);
-        debug(1, " returning getInsertableElements(node, " + index + "): " + toString(retNames));
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 1) {
+        	MerlotDebug.msg(" returning getInsertableElements(node, "
+        			+ index + "): " + toString(retNames));
+        }
         return ret;
     }
 
@@ -170,8 +175,12 @@ public abstract class GrammarComplexType {
             el = (Element)node;
         String elementName = el.getNodeName();
         String[] currentChildElements = getChildNodeNames(el);
-        debug(1, "getInsertableElements(" + node.getNodeName() + "): Children: " +
-            toString(currentChildElements));
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 1) {
+        	MerlotDebug.msg("getInsertableElements(" + node.getNodeName()
+        			+ "): Children: " + toString(currentChildElements));
+        }
         // Use a list temporarily to maintain the sequence
         List list = new Vector();
         int length = currentChildElements.length;
@@ -194,7 +203,12 @@ public abstract class GrammarComplexType {
         noDuplicates.addAll(list);
         ret = (GrammarComplexType[])noDuplicates.toArray(ret);
         String[] retNames = getNames(ret);
-        debug(1, "returning getInsertableElements(node): " + toString(retNames));
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 1) {
+        	MerlotDebug.msg("returning getInsertableElements(node): "
+        			+ toString(retNames));
+        }
         return ret;
     }
     
@@ -239,7 +253,7 @@ public abstract class GrammarComplexType {
         debug(1, "Validating structure of " + el.getNodeName());
         Node parentNode = el.getParentNode();
         if (!(parentNode instanceof Element)) {
-            MerlotDebug.msg(" Parent node is not an element.");
+            MerlotDebug.msg(" GrammarComplexType.getIsLocationValid: Parent node is not an element.");
             return true;
         }
         GrammarComplexType parentComplexType = getParentComplexType(el);
@@ -539,13 +553,22 @@ public abstract class GrammarComplexType {
         long start = System.currentTimeMillis();
         if (isEmptyType())
             return new String[0];
-        debug(2, "  whatCanGoHere: " + insertPosition + " " + toString(currentChildElements));
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 2) {
+        	MerlotDebug.msg("  whatCanGoHere: " + insertPosition + " "
+        			+ toString(currentChildElements));
+        }
         if (insertPosition > currentChildElements.length) {
             debug(1, "  Insert position is beyond last child.");
             insertPosition = currentChildElements.length;
         }
         String[] childNames = getNames(getChildren());
-        debug(2, "  ChildNames: " + toString(childNames));
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 2) {
+        	MerlotDebug.msg("  ChildNames: " + toString(childNames));
+        }
         String[] candidates = new String[currentChildElements.length + 1];
         for (int i = 0; i < insertPosition; i++) {
             candidates[i] = currentChildElements[i];
@@ -553,7 +576,12 @@ public abstract class GrammarComplexType {
         for (int i = (insertPosition + 1); i < (currentChildElements.length + 1); i++) {
             candidates[i] = currentChildElements[i - 1];
         }
-        debug(2, "  Candidates: " + toString(candidates));
+
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 2) {
+        	MerlotDebug.msg("  Candidates: " + toString(candidates));
+        }
         Vector results = new Vector();
         for (int i = 0; i < childNames.length; i++) {
             String candidate = childNames[i];
@@ -567,7 +595,12 @@ public abstract class GrammarComplexType {
         }
         String[] ret = new String[0];
         ret = (String[])results.toArray(ret);
-        debug(2, "  whatCanGoHere: " + toString(ret));
+
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 2) {
+        	MerlotDebug.msg("  whatCanGoHere: " + toString(ret));
+        }
         long end = System.currentTimeMillis();
         System.out.println("Duration - what can go here: " + (end-start) + " ms.");
         return ret;

@@ -27,9 +27,13 @@ public class ValidationThread extends Thread {
     
     public void addElementToValidationQueue(MerlotDOMElement element) {
         synchronized (_queue) {
-            if (_running && !_queue.contains(element)) {
+            if (_running && !element.isInValidationQueue()) {
                 //MerlotDebug.msg("Validation queue: " + _queue.size() + "; Adding " + element.getNodeName());
                 _queue.add(element);
+
+                final int qsize = _queue.size();
+				element.setValidationQueueIndex(qsize-1);
+
                 removeParent(element);
             }
         }
@@ -37,22 +41,43 @@ public class ValidationThread extends Thread {
     
     void removeParent(MerlotDOMNode node) {
         MerlotDOMNode parent = node.getParentNode();
-        if (parent != null && _queue.contains(parent)) {
-            _queue.remove(parent);
+    	if (parent != null && parent.isInValidationQueue()) {
+    		_queue.setElementAt(null, parent.getValidationQueueIndex());
             _queue.add(parent);
+    		final int qsize = _queue.size();
+			parent.setValidationQueueIndex(qsize-1);
         }
-        if (parent != null)
+    	if (parent != null) {
             removeParent(parent);
+    	}
     }
     
     public void run() {
-        while (_running) {
+    	long timeStart = -1;
+    	int frontNodeIndex = 0;
+
+    	while (_running) {
             try {
                 long timeNow = System.currentTimeMillis();
                 if (timeNow - _lastStatusUpdate > 300) {
-                    if (_queue.isEmpty())
+                    if (_queue.isEmpty()) {
                         displayStatus("");
+
+                        if(timeStart != -1) {
+                        	MerlotDebug.msg("Time = "
+                        			+ (System.currentTimeMillis()-timeStart));
+                        	timeStart = -1;
+                        }
+                    }
                     else {
+
+                    	if(timeStart == -1) {
+                    		timeStart = System.currentTimeMillis();
+                    		MerlotDebug.msg("Time start = "
+									+ new java.util.Date(timeStart) + " ("
+									+ timeStart + ")");
+                    	}
+
                         if (_lastStatusMessageNumber == 0) {
                             displayStatus("Validating elements");
                             _lastStatusMessageNumber = 1;
@@ -71,11 +96,29 @@ public class ValidationThread extends Thread {
                 }
                 MerlotDOMElement next = null;
                 synchronized (_queue) {
-                    if (!_queue.isEmpty()) {
-                        next = (MerlotDOMElement) _queue.remove(0);
-                        //MerlotDebug.msg("Validation queue: " + _queue.size() + "; Now processing " + next.getNodeName());
+                	// As the queue is processed first in first out, the element
+                	// is nulled out. Find the first non-null element
+                	// this allows maintaining the indices the same in the
+                	// nodes so they can be cached and we don't end up with
+                	// too many calls to equals() to find the node (on a large
+                	// file I measured 1.1 trillion calls to equals)
+                	while(frontNodeIndex < _queue.size()) {
+                		next = (MerlotDOMElement) _queue.get(frontNodeIndex++);
+                		if(next != null) {
+                			_queue.setElementAt(null, frontNodeIndex-1);
+                			next.setValidationQueueIndex(-1);
+                			break;
+                		}
+                	}
+
+                	// Nodes are always added to the end, so if the end is
+                	// reached, empty the queue
+                	if(frontNodeIndex == _queue.size()) {
+                		_queue.clear();
+                		frontNodeIndex = 0;
                     }
                 }
+
                 if (next != null) {
                     next.validateNow();
                 } else
@@ -85,15 +128,8 @@ public class ValidationThread extends Thread {
                 t.printStackTrace();
             }
         }
-    }
-    
-    public void waitForValidationToFinish() {
-        while (_running && !_queue.isEmpty()) {
-            try {
-                sleep(10);
-            } catch (InterruptedException e) {
-            }
-        }
+        MerlotDebug.msg("Validation thread exiting: "
+        		+ Thread.currentThread().toString());
     }
     
     void displayStatus(String status) {

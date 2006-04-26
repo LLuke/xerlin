@@ -14,6 +14,7 @@ import org.apache.xerces.xs.XSParticle;
 import org.apache.xerces.xs.XSSimpleTypeDefinition;
 import org.apache.xerces.xs.XSTerm;
 import org.apache.xerces.xs.XSTypeDefinition;
+import org.merlotxml.merlot.MerlotDebug;
 import org.merlotxml.util.xml.FieldNode;
 import org.merlotxml.util.xml.GrammarComplexType;
 import org.merlotxml.util.xml.GrammarSimpleType;
@@ -254,8 +255,12 @@ public class SchemaGrammarComplexTypeImpl extends GrammarComplexType {
             return ret;
         }
         String[] currentChildElements = getChildNodeNamesWithoutText(el);
-        debug(2, "   Validating structure for " + el.getNodeName()
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+		if(debugLevel >= 2) {
+			MerlotDebug.msg("   Validating structure for " + el.getNodeName()
              + ": " + toString(currentChildElements));
+		}
         ret = validate(currentChildElements);
         _validationResults.put(key, new Integer(ret));
         return ret;
@@ -315,8 +320,13 @@ public class SchemaGrammarComplexTypeImpl extends GrammarComplexType {
             // Example: 3 total, 0 invalid: 3 valid; ret=-1
             ret = total - invalid;
         }
-        debug(3, "  Remaining: " + toString(candidateNodeNamesVector));
-        debug(3, "  Returning: " + ret);
+
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 3) {
+        	MerlotDebug.msg("  Remaining: " + toString(candidateNodeNamesVector));
+        	MerlotDebug.msg("  Returning: " + ret);
+        }
         return ret;
     }
 
@@ -330,7 +340,13 @@ public class SchemaGrammarComplexTypeImpl extends GrammarComplexType {
         StringBuffer spaces = new StringBuffer();
         for (int i = 0; i < level; i++)
             spaces.append(' ');
-        debug(4, spaces + "Validating " + particle + ": " + toString(candidateNodeNames));
+
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 4) {
+        	MerlotDebug.msg(spaces + "Validating " + particle + ": "
+        			+ toString(candidateNodeNames));
+        }
         if (particle == null)
             return true;
         if (particle == null) {
@@ -465,7 +481,13 @@ public class SchemaGrammarComplexTypeImpl extends GrammarComplexType {
         StringBuffer spaces = new StringBuffer();
         for (int i = 0; i < level; i++)
             spaces.append(' ');
-        debug(3, spaces + "whatCanGoHere " + particle + ": " + toString(candidateNodeNames));
+
+		// this toString() is expensive... to prevent it from
+		// unnecessarily being called, don't use debug() helper function 
+        if(debugLevel >= 3) {
+        	MerlotDebug.msg(spaces + "whatCanGoHere " + particle + ": "
+        			+ toString(candidateNodeNames));
+        }
         if (particle == null)
             return true;
         if (particle == null) {
