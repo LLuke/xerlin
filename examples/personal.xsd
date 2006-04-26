@@ -2,13 +2,6 @@
 <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>
 
  <xs:element name="personnel">
-<<<<<<< personal.xsd
-    <xs:annotation>
-        <xs:documentation xml:lang="en">
-        Personnel element with anonymous type
-  </xs:documentation>
- </xs:annotation>
-=======
   <xs:annotation>
     <xs:documentation>
 	<b><font color="blue">Personnel Details</font></b><br/>
@@ -19,7 +12,6 @@
       element declaration in the XSD.
     </xs:documentation>
   </xs:annotation>
->>>>>>> 1.1.2.5
   <xs:complexType>
     <xs:annotation>
         <xs:documentation xml:lang="en">
@@ -53,20 +45,12 @@
  </xs:element>
 
  <xs:element name="person">
-<<<<<<< personal.xsd
-    <xs:annotation>
-        <xs:documentation xml:lang="en">
-            A person element
-        </xs:documentation>
-    </xs:annotation>
-=======
   <xs:annotation>
     <xs:documentation>
 	<b><font color="blue">Person Details</font></b><br/>
 	<i>This element contains details about a person.</i><br/>
     </xs:documentation>
   </xs:annotation>
->>>>>>> 1.1.2.5
   <xs:complexType mixed="true">
    <xs:sequence>
      <xs:element ref="name"/>
